@@ -1,48 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@mantine/core';
 import { Avatar } from '@mantine/core';
 import styles from '../css/Box.module.css';
+import Tab1 from './Tab1';
+import Tab2 from './Tab2';
+import Tab3 from './Tab3';
 
 function Box1() {
+  const [tab, settab] = useState<Number>(1);
+  const addbuttonhandler = (t: Number) => {
+    settab(t);
+  };
   return (
     <>
       <div className={styles.outerBox1}>
-        <div className={styles.innerBox1}>
-          <div className={styles.avatarbox}>
-            <Avatar
-              src={require('../public/favicon.svg')}
-              alt="it's me"
-              sx={{ justifySelf: 'center', margin: 'auto', width: '20px' }}
-            />
-          </div>
-          <div className={styles.naming}>
-            <div>Admin Name</div>
-            <div>Level 2</div>
-          </div>
-        </div>
-        <div className={styles.buttonsgrp1}>
-          <Button variant="white" fullWidth sx={{ color: '#000', fontWeight: 600 }}>
-            Add Delievery Location
-          </Button>
-          <Button variant="white" fullWidth sx={{ color: '#000', fontWeight: 600 }}>
-            Add Pickup Location
-          </Button>
-          <Button variant="white" fullWidth sx={{ color: '#000', fontWeight: 600 }}>
-            Show Rides
-          </Button>
-        </div>
-        <Button
-          variant="white"
-          sx={{
-            color: '#000',
-            fontWeight: 600,
-            maxWidth: '130px',
-            textAlign: 'left',
-            backgroundColor: '#F7F7F6',
-          }}
-        >
-          Logout &gt;
-        </Button>
+        {tab == 1 ? (
+          <Tab1 addbuttonhandler={addbuttonhandler} />
+        ) : tab == 2 ? (
+          <Tab2 addbuttonhandler={addbuttonhandler} />
+        ) : (
+          <Tab3 addbuttonhandler={addbuttonhandler} />
+        )}
       </div>
       <div className={styles.startbtnup1}>
         <Button variant="white" className={styles.startbtn}>

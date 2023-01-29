@@ -105,3 +105,26 @@
     border-radius: 20%;
   }
 }
+
+.tab2 {
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.backicon {
+  width: 80%;
+  /* margin: 20%; */
+  margin-top: 20px;
+  display: flex;
+  justify-content: right;
+}
+
+.listscrollable {
+  max-height: 40vh;
+  overflow-y: scroll;
+}
