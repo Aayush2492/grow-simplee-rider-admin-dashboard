@@ -6,6 +6,7 @@ authors = ["Rachit Keerti Das"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+psycopg2-binary = "^^2.9"
 fastapi = "^0.89.0"
 uvicorn = {extras = ["standard"], version = "^0.20.0"}
 

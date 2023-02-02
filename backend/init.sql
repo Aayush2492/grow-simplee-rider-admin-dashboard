@@ -45,10 +45,9 @@ CREATE TABLE tour
     tour_id             BIGSERIAL   NOT NULL,
     assigned_rider      BIGINT      NOT NULL,
     assigned_bag        BIGINT      NOT NULL,
-    delivery            BIGINT      NOT NULL,
-    delivery_order      INT         NOT NULL,
+    delivery            BIGINT[]    NOT NULL,
+    delivery_order      INT[]       NOT NULL,
     PRIMARY KEY (tour_id),
-    FOREIGN KEY (assigned_rider)    REFERENCES rider(rider_id), 
-    FOREIGN KEY (assigned_bag)      REFERENCES bag(bag_id),
-    FOREIGN KEY (delivery)          REFERENCES package(object_id)
+    FOREIGN KEY (assigned_rider)            REFERENCES rider(rider_id), 
+    FOREIGN KEY (assigned_bag)              REFERENCES bag(bag_id)
 );
