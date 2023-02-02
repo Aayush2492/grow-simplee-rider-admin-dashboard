@@ -1,6 +1,7 @@
 from typing import Union
 
 from fastapi import FastAPI, Request, HTTPException
+import aiosql
 import psycopg2
 import os
 from dotenv import load_dotenv
@@ -24,6 +25,7 @@ conn = psycopg2.connect(
 print("Opened database successfully!")
 
 app = FastAPI()
+queries = aiosql.from_path("../db", "psycopg2")
 
 @app.get("/")
 def read_root():
@@ -34,9 +36,14 @@ async def add_locations(info : Request):
     details = await info.json()
     cur = conn.cursor()
     locations_to_add = details["locations"]
-    insert_query = "INSERT INTO location (latitude, longitude) VALUES (%s, %s)"
+    # insert_query = "INSERT INTO location (latitude, longitude) VALUES (%s, %s)"
     for location in locations_to_add:
-        cur.execute(insert_query, (location["latitude"], location["longitude"],))
+        # cur.execute(insert_query, (location["latitude"], location["longitude"],))
+        queries.insert_location(
+            conn,
+            latitude=location["latitude"],
+            longitude=location["longitude"]
+        )
 
     try:
         conn.commit()

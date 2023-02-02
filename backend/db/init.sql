@@ -30,7 +30,7 @@ CREATE TABLE package
     length          FLOAT,
     breadth         FLOAT,
     height          FLOAT,
-    delivery_date   TIMESTAMP    NOT NULL,
+    delivery_date   TIMESTAMP   NOT NULL,
     delivery_loc    BIGINT      NOT NULL,
     erroneous       BOOL        NOT NULL    DEFAULT true,
     comments        VARCHAR(200),
@@ -45,9 +45,16 @@ CREATE TABLE tour
     tour_id             BIGSERIAL   NOT NULL,
     assigned_rider      BIGINT      NOT NULL,
     assigned_bag        BIGINT      NOT NULL,
-    delivery            BIGINT[]    NOT NULL,
-    delivery_order      INT[]       NOT NULL,
     PRIMARY KEY (tour_id),
-    FOREIGN KEY (assigned_rider)            REFERENCES rider(rider_id), 
-    FOREIGN KEY (assigned_bag)              REFERENCES bag(bag_id)
+    FOREIGN KEY (assigned_rider)    REFERENCES rider(rider_id), 
+    FOREIGN KEY (assigned_bag)      REFERENCES bag(bag_id)
+);
+
+CREATE TABLE delivery
+(
+    id              BIGINT      NOT NULL,
+    item            BIGINT      NOT NULL,
+    delivery_order  INT         NOT NULL,
+    FOREIGN KEY     (item)      REFERENCES package(object_id),
+    FOREIGN KEY     (id)        REFERENCES tour(tour_id)
 );
