@@ -6,13 +6,16 @@ authors = ["Rachit Keerti Das"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-psycopg2-binary = "^^2.9"
+psycopg2-binary = "^2.9"
 fastapi = "^0.89.0"
 uvicorn = {extras = ["standard"], version = "^0.20.0"}
+aiosql = "^7.2"
+python-dotenv = "^0.21.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
 black = "^22.12.0"
+isort = "^5.12.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
