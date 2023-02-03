@@ -13,13 +13,17 @@ class Package(BaseModel):
     obj_type: bool = True
     completed: bool = False
 
-class Location(BaseModel):
+class PackageOut(Package):
+    object_id: int
 
+class Location(BaseModel):
     latitude: float
     longitude: float
 
-class Rider(BaseModel):
+class LocationOut(BaseModel):
+    id: int
 
+class Rider(BaseModel):
     longitude: float
     latitude: float
     current_trip : Union[int, None] = None

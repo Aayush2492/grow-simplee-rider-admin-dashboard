@@ -1,11 +1,14 @@
 from typing import Union, List
 
+from pydantic import parse_obj_as
 from fastapi import FastAPI, Request, HTTPException, status
 import aiosql
 import psycopg2
+from psycopg2.extras import Json, RealDictCursor
+
 import os
 from dotenv import load_dotenv
-from models.models import Package, Location 
+from models.models import Package, Location, PackageOut
 
 load_dotenv()
 
@@ -20,7 +23,8 @@ conn = psycopg2.connect(
                     user=POSTGRES_USER, 
                     password=POSTGRES_PASS, 
                     host=POSTGRES_HOST, 
-                    port=POSTGRES_PORT
+                    port=POSTGRES_PORT,
+                    cursor_factory=RealDictCursor
 )
 
 print("Opened database successfully!")
@@ -51,20 +55,58 @@ async def add_locations(locations: List[Location]):
         conn.rollback()
         raise HTTPException(status_code=500, detail="Some Error Occured")
 
-@app.get('/package/{item_id}')
-def get_item(item_id: int):
+@app.get('/packages', response_model=List[PackageOut])
+def get_all_packages():
+    """
+    Get the List of All Packages present in the DB
+    """
+    try:
+        results = queries.get_all_packages(conn)
+    except Exception as err:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(err))
+    return parse_obj_as(List[PackageOut], results)
 
-    return {"item":"item"}
+
+@app.get('/package/{obj_id}', response_model=PackageOut)
+def get_package(obj_id: int):
+    """
+    Get the details of a particular package from DB.
+    """
+    try:
+        results = queries.get_package_by_id(conn,obj_id=obj_id)
+    except Exception as err:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(err))
+    return PackageOut.parse_obj(results)
 
 @app.post('/package', status_code=status.HTTP_201_CREATED)
-def add_item(package: Package):
+def add_package(package: Package):
 
     return {"message": "Item Created"}
 
-@app.delete('/package/{item_id}')
-def delete_item(item_id: int):
+@app.patch('/package/{obj_id}')
+def edit_package(obj_id: int):
 
-    return {"status":"ok"}
+    return {'message': 'ok'}
+
+@app.delete('/package/{obj_id}')
+def delete_package(obj_id: int):
+    """
+    Delete Objects whose object_id is equal to the passed id.
+    """
+    results = queries.delete_package(conn, obj_id=obj_id)
+    try:
+        conn.commit()
+    except Exception as err:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(err))
+
+    return {"num_deleted":results}
+
+@app.post('/solveall')
+def solve_all():
+    return {'status':'ok'}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
