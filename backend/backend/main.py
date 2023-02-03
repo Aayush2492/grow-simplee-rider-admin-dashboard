@@ -1,10 +1,11 @@
-from typing import Union
+from typing import Union, List
 
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, status
 import aiosql
 import psycopg2
 import os
 from dotenv import load_dotenv
+from models.models import Package, Location 
 
 load_dotenv()
 
@@ -25,24 +26,22 @@ conn = psycopg2.connect(
 print("Opened database successfully!")
 
 app = FastAPI()
-queries = aiosql.from_path("../db", "psycopg2")
+queries = aiosql.from_path("db", "psycopg2")
 
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
 
 @app.post("/location")
-async def add_locations(info : Request):
-    details = await info.json()
+async def add_locations(locations: List[Location]):
     cur = conn.cursor()
-    locations_to_add = details["locations"]
     # insert_query = "INSERT INTO location (latitude, longitude) VALUES (%s, %s)"
-    for location in locations_to_add:
+    for loc in locations:
         # cur.execute(insert_query, (location["latitude"], location["longitude"],))
         queries.insert_location(
             conn,
-            latitude=location["latitude"],
-            longitude=location["longitude"]
+            latitude=loc.latitude,
+            longitude=loc.longitude
         )
 
     try:
@@ -51,3 +50,21 @@ async def add_locations(info : Request):
         print(e)
         conn.rollback()
         raise HTTPException(status_code=500, detail="Some Error Occured")
+
+@app.get('/package/{item_id}')
+def get_item(item_id: int):
+
+    return {"item":"item"}
+
+@app.post('/package', status_code=status.HTTP_201_CREATED)
+def add_item(package: Package):
+
+    return {"message": "Item Created"}
+
+@app.delete('/package/{item_id}')
+def delete_item(item_id: int):
+
+    return {"status":"ok"}
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
