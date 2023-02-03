@@ -12,6 +12,8 @@ CREATE TABLE rider
     rider_id    BIGSERIAL   NOT NULL,
     name        VARCHAR(50) NOT NULL,
     contact     DECIMAL     NOT NULL,
+	latitude    FLOAT,
+	longitude   FLOAT,
     PRIMARY KEY (rider_id),
     UNIQUE      (contact)
 );
