@@ -1,8 +1,12 @@
 import React from 'react';
-import { MapContainer, Marker, TileLayer, Popup } from 'react-leaflet';
+import { MapContainer, Marker, TileLayer, Popup, GeoJSON } from 'react-leaflet';
+
+import geoJSONData from '../../data/karnataka_geodata.json';
+
+// const geoJSONData = JSON.parse(
 
 const Map = () => (
-  <MapContainer center={[51.505, -0.09]} zoom={13} style={{ height: '50vh', width: '50vw' }}>
+  <MapContainer center={[12.9716, 77.5946]} zoom={10} style={{ height: '50vh', width: '50vw' }}>
     <TileLayer
       attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -12,6 +16,8 @@ const Map = () => (
         A pretty CSS3 popup. <br /> Easily customizable.
       </Popup>
     </Marker>
+    {/* GeoJSON data for each route goes here in JSON format. Use OSRM to get LineString output for shortest route between two points */}
+    {/* <GeoJSON data={geoJSONData} /> */}
   </MapContainer>
 );
 
