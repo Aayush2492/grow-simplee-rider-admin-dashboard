@@ -81,9 +81,17 @@ def get_package(obj_id: int):
     return PackageOut.parse_obj(results)
 
 @app.post('/package', status_code=status.HTTP_201_CREATED)
-def add_package(package: Package):
-
-    return {"message": "Item Created"}
+def add_package(item: Package):
+    """
+    Adds a Package with the given parameters in the database.
+    """
+    try:
+        results = queries.insert_package(conn, **dict(item))
+        conn.commit() 
+    except Exception as err:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=err)
+    return {"message": results}
 
 @app.patch('/package/{obj_id}')
 def edit_package(obj_id: int):
@@ -95,8 +103,8 @@ def delete_package(obj_id: int):
     """
     Delete Objects whose object_id is equal to the passed id.
     """
-    results = queries.delete_package(conn, obj_id=obj_id)
     try:
+        results = queries.delete_package(conn, obj_id=obj_id)
         conn.commit()
     except Exception as err:
         conn.rollback()

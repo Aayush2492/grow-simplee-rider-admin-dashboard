@@ -21,7 +21,7 @@ CREATE TABLE rider
 CREATE TABLE bag
 (
     bag_id      BIGSERIAL   NOT NULL,
-    type        BOOL        NOT NULL,
+    bag_type        BOOL        NOT NULL,
     PRIMARY KEY (bag_id)
 );
 
@@ -36,7 +36,7 @@ CREATE TABLE package
     delivery_loc    BIGINT      NOT NULL,
     erroneous       BOOL        NOT NULL    DEFAULT true,
     comments        VARCHAR(200),
-    type            BOOL        NOT NULL,
+    obj_type            BOOL        NOT NULL,
     completed       BOOL        NOT NULL    DEFAULT false,
     PRIMARY KEY (object_id),
     FOREIGN KEY (delivery_loc)  REFERENCES location(loc_id)

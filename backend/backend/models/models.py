@@ -3,6 +3,7 @@ from typing import Union
 from datetime import datetime
 
 class Package(BaseModel):
+    weight: int
     length : int
     breadth: int
     height: int
