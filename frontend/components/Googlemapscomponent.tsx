@@ -18,7 +18,6 @@ function Googlemapscomponent() {
       <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string}>
         <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={10}>
           {/* Child components, such as markers, info windows, etc. */}
-          <></>
         </GoogleMap>
       </LoadScript>
     </div>

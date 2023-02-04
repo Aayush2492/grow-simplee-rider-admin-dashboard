@@ -30,15 +30,17 @@
     "@mantine/prism": "5.9.0",
     "@next/bundle-analyzer": "^12.3.1",
     "@react-google-maps/api": "^2.17.1",
-    "@tabler/icons": "^1.107.0",
+    "@tabler/icons": "^1.119.0",
     "cookies-next": "^2.1.1",
     "dayjs": "^1.11.6",
     "embla-carousel-react": "^7.0.3",
+    "leaflet": "^1.9.3",
     "next": "12.3.1",
     "react": "18.2.0",
     "react-cool-onclickoutside": "^1.7.0",
     "react-dom": "18.2.0",
-    "use-places-autocomplete": "^4.0.0"
+    "use-places-autocomplete": "^4.0.0",
+    "react-leaflet": "^4.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.17.8",
@@ -49,6 +51,7 @@
     "@testing-library/react": "^13.0.0",
     "@testing-library/user-event": "^14.0.4",
     "@types/jest": "^27.4.1",
+    "@types/leaflet": "^1.9.0",
     "@types/node": "^18.11.4",
     "@types/react": "18.0.21",
     "@typescript-eslint/eslint-plugin": "^5.30.0",
