@@ -10,7 +10,7 @@ export default function RiderPage({}) {
     <>
       <RiderNavbar>
         <Container p={0}>
-          <MapComponent />
+          <MapComponent height={'100vh'} width={'66vw'} />
         </Container>
       </RiderNavbar>
     </>
