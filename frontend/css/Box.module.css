@@ -12,9 +12,11 @@
   justify-content: space-between;
   flex-direction: column;
   background-color: #f7f7f6;
+  z-index: 1000;
 }
 .menuadmin {
   display: none;
+  z-index: 1000;
 }
 .innerBox1 {
   width: 25vw;

@@ -7,13 +7,19 @@ import { Container, Flex, Button } from '@mantine/core';
 
 function Admin() {
   const [display, setdisplay] = useState(true);
+  const [selectPosition, setSelectPosition] = useState<{ lat: number; lon: number }>({
+    lat: 12.9716,
+    lon: 77.5946,
+  });
   return (
     <>
       <div style={{ width: '100vw', height: '100vh', position: 'fixed' }}>
         <Flex justify="flex-start" align="flex-start" direction="row">
-          <Container>
-            <Box1 />
-          </Container>
+          {display && (
+            <Container>
+              <Box1 selectPosition={selectPosition} setSelectPosition={setSelectPosition} />
+            </Container>
+          )}
           <Container>
             <div className={styles.menuadmin} onClick={() => setdisplay(!display)}>
               <img
@@ -25,7 +31,7 @@ function Admin() {
             <Button variant="white">START</Button>
           </Container>
           <Container>
-            <MapComponent height={'100vh'} width={'66vw'} />
+            <MapComponent height={'100vh'} width={'100vw'} selectPosition={selectPosition} />
           </Container>
         </Flex>
       </div>
