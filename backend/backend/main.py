@@ -1,5 +1,4 @@
 from typing import Union, List
-
 from pydantic import parse_obj_as
 from fastapi import FastAPI, Request, HTTPException, status
 import aiosql
@@ -9,6 +8,7 @@ from psycopg2.extras import Json, RealDictCursor
 import os
 from dotenv import load_dotenv
 from models.models import Package, Location, PackageOut
+from routing.load import solve_routes
 
 load_dotenv()
 
@@ -115,8 +115,13 @@ def delete_package(obj_id: int):
     return {"num_deleted": results}
 
 
-@app.post("/solveall")
+@app.get("/solveall")
 def solve_all():
+    # First compute the distance matrix
+
+    # Now solve the routes and get the trip locations 
+    trips, trip_indices = solve_routes()
+    # Now insert the trips to the DB, and assign the riders accordingly
     return {"status": "ok"}
 
 
@@ -125,9 +130,23 @@ def pickup():
     """
     WIP
     """
-    pass
     return {"status": "ok"}
 
+
+@app.get("/rider/{rider_id}/viewtrip")
+def viewroute(rider_id: int):
+    """
+    Will Give you a GeoJSON of a trip if the current trip exists. 
+    Else, you get a status 404, indicating that you do not have a current trip
+    """
+    try:
+        result = queries.check_trip(conn, rider_id=rider_id)
+        if result is None:
+            raise HTTPException(status_code=404, detail='Trip not assigned or active')
+        
+    except Exception as err:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(err))
 
 @app.post("/rider/{rider_id}/accept")
 def accept_trip(rider_id: int):
@@ -164,6 +183,7 @@ def update_loc(rider_id: int, latitude: float, longitude: float):
         results = queries.update_loc(
             conn, rider_id=rider_id, latitude=latitude, longitude=longitude
         )
+        results = queries.check_trip(conn, rider_id=rider_id)
         # This query will return 0 if the current tour is accepted and 1 otherwise, 2 if no trip exists
         conn.commit()
     except Exception as err:
