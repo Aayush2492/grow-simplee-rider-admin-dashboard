@@ -25,3 +25,8 @@ SELECT * FROM rider WHERE rider_id = :rider_id;
 
 -- name: get_riders
 SELECT * FROM rider;
+
+-- name: update_loc
+-- WIP. This should also return trip status, if such a trip exists
+UPDATE rider SET latitude = :latitude AND longitude = :longitude WHERE rider_id = :rider_id;
+
