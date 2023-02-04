@@ -77,7 +77,7 @@ const mockdata = [
 ];
 
 export default function RiderNavbar({ children }) {
-  const [active, setActive] = useState(2);
+  const [active, setActive] = useState(1);
 
   const links = mockdata.map((link, index) => (
     <NavbarLink
@@ -90,8 +90,14 @@ export default function RiderNavbar({ children }) {
 
   return (
     <>
-      <Flex justify="center" align="center" direction="row" wrap="wrap-reverse">
-        <Navbar height={750} width={{ base: 80 }} p="md">
+      <Flex
+        justify="center"
+        align="center"
+        direction="row"
+        wrap="wrap-reverse"
+        gap={{ base: 'sm' }}
+      >
+        <Navbar height={700} width={{ base: 80 }} p={'xs'}>
           <Center>{/* <MantineLogo type="mark" size={30} /> */}</Center>
           <Navbar.Section grow mt={50}>
             <Stack justify="center" spacing={0}>
@@ -105,10 +111,10 @@ export default function RiderNavbar({ children }) {
             </Stack>
           </Navbar.Section>
         </Navbar>
-        <Container>
+        <Container p={0}>
           {active === 1 && (
             <>
-              <ScrollArea style={{ height: '600px' }} offsetScrollbars>
+              <ScrollArea style={{ height: '95vh' }} offsetScrollbars>
                 <LocationCard />
                 <LocationCard />
                 <LocationCard />
@@ -116,7 +122,7 @@ export default function RiderNavbar({ children }) {
             </>
           )}
         </Container>
-        <Container>{children}</Container>
+        <>{children}</>
       </Flex>
     </>
   );
