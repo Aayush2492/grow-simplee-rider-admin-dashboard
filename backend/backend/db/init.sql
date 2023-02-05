@@ -3,6 +3,7 @@ CREATE TABLE location
     loc_id      BIGSERIAL   NOT NULL,
     latitude    FLOAT       NOT NULL,
     longitude   FLOAT       NOT NULL,
+    address     VARCHAR(1024)   DEFAULT 'Address',
     PRIMARY KEY (loc_id),
     UNIQUE      (latitude, longitude)
 );
