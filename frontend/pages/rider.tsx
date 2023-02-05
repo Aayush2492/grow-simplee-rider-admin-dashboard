@@ -1,6 +1,6 @@
 import React from 'react';
 // import { GoogleMap, LoadScript } from '@react-google-maps/api';
-import { Center, Container } from '@mantine/core';
+import { Container } from '@mantine/core';
 import RiderNavbar from '../components/RiderNavbar';
 import { MapComponent } from '../components/MapComponent';
 

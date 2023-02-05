@@ -1,29 +1,28 @@
 import { useState } from 'react';
 import {
   Navbar,
-  Center,
+  Drawer,
   Tooltip,
   UnstyledButton,
   createStyles,
   Stack,
   Flex,
-  Container,
-  ScrollArea,
+  Divider,
 } from '@mantine/core';
 import {
   TablerIcon,
-  IconHome2,
-  IconGauge,
-  IconDeviceDesktopAnalytics,
-  IconFingerprint,
-  IconCalendarStats,
-  IconUser,
-  IconSettings,
   IconLogout,
-  IconSwitchHorizontal,
+  IconTruck,
+  IconPackage,
+  IconTruckReturn,
+  IconBike,
+  IconUser,
 } from '@tabler/icons';
-// import { MantineLogo } from '@mantine/ds';
-import LocationCard from './LocationCard';
+import AddNewDeliveryDrawer from './Drawers/AddNewDeliveryDrawer';
+// import AddNewPickUpDrawer from '../Drawers/AddNewPickUpDrawer';
+import RidersDrawer from './Drawers/RidersDrawer';
+import PackagesDrawer from './Drawers/PackagesDrawer';
+import ProfileDrawer from './Drawers/ProfileDrawer';
 
 const useStyles = createStyles((theme) => ({
   link: {
@@ -67,38 +66,56 @@ function NavbarLink({ icon: Icon, label, active, onClick }: NavbarLinkProps) {
 }
 
 const mockdata = [
-  { icon: IconHome2, label: 'Home' },
-  { icon: IconGauge, label: 'Dashboard' },
-  { icon: IconDeviceDesktopAnalytics, label: 'Analytics' },
-  { icon: IconCalendarStats, label: 'Releases' },
-  { icon: IconUser, label: 'Account' },
-  { icon: IconFingerprint, label: 'Security' },
-  { icon: IconSettings, label: 'Settings' },
+  { icon: IconTruck, label: 'Deliver', title: 'Add New Delivery' },
+  { icon: IconTruckReturn, label: 'Pickup', title: 'Add New Pickup Point' },
+  { icon: IconBike, label: 'Drivers', title: 'Riders' },
+  { icon: IconPackage, label: 'Packages', title: 'Packages' },
+  { icon: IconUser, label: 'Profile', title: 'Profile' },
 ];
 
-export default function RiderNavbar({ children }) {
-  const [active, setActive] = useState(1);
+export default function AdminNavbar({ children }) {
+  const [active, setActive] = useState(0);
 
   const links = mockdata.map((link, index) => (
     <NavbarLink
       {...link}
       key={link.label}
       active={index === active}
-      onClick={() => setActive(index)}
+      onClick={() => setActive(index === active ? -1 : index)}
     />
   ));
 
   return (
     <>
       <Flex
-        justify="center"
+        justify="flex-start"
         align="center"
         direction="row"
         wrap="wrap-reverse"
         gap={{ base: 'sm' }}
       >
-        <Navbar height={'100vh'} width={{ base: 80 }} p={'xs'}>
-          <Center>{/* <MantineLogo type="mark" size={30} /> */}</Center>
+        <>
+          <Drawer
+            opened={active >= 0}
+            onClose={() => setActive(-1)}
+            title={
+              <>
+                <strong style={{ color: '#2596be' }}>{mockdata[active]?.title}</strong>
+                <Divider size="md" />
+              </>
+            }
+            padding="xl"
+            size="xl"
+            style={{ translate: '5%' }}
+          >
+            {active === 0 && <AddNewDeliveryDrawer isDelivery={true} />}
+            {active === 1 && <AddNewDeliveryDrawer isDelivery={false} />}
+            {active === 2 && <RidersDrawer />}
+            {active === 3 && <PackagesDrawer />}
+            {active === 4 && <ProfileDrawer />}
+          </Drawer>
+        </>
+        <Navbar height={'100vh'} width={{ base: '5%' }} p={'xs'}>
           <Navbar.Section grow mt={50}>
             <Stack justify="center" spacing={0}>
               {links}
@@ -106,22 +123,10 @@ export default function RiderNavbar({ children }) {
           </Navbar.Section>
           <Navbar.Section>
             <Stack justify="center" spacing={0}>
-              <NavbarLink icon={IconSwitchHorizontal} label="Change account" />
               <NavbarLink icon={IconLogout} label="Logout" />
             </Stack>
           </Navbar.Section>
         </Navbar>
-        <Container p={0}>
-          {active === 1 && (
-            <>
-              <ScrollArea style={{ height: '95vh' }} offsetScrollbars>
-                <LocationCard />
-                <LocationCard />
-                <LocationCard />
-              </ScrollArea>
-            </>
-          )}
-        </Container>
         <>{children}</>
       </Flex>
     </>
