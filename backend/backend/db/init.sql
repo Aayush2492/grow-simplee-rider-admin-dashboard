@@ -5,7 +5,7 @@ CREATE TABLE location
     longitude   FLOAT       NOT NULL,
     address     VARCHAR(1024)   DEFAULT 'Address',
     PRIMARY KEY (loc_id),
-    UNIQUE      (latitude, longitude)
+    UNIQUE      (latitude, longitude, address)
 );
 
 CREATE TABLE rider

@@ -44,7 +44,7 @@ async def add_locations(locations: List[Location]):
     # insert_query = "INSERT INTO location (latitude, longitude) VALUES (%s, %s)"
     for loc in locations:
         # cur.execute(insert_query, (location["latitude"], location["longitude"],))
-        queries.insert_location(conn, latitude=loc.latitude, longitude=loc.longitude)
+        queries.insert_location(conn, latitude=loc.latitude, longitude=loc.longitude, address=loc.address)
 
     try:
         conn.commit()

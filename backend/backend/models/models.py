@@ -20,6 +20,7 @@ class PackageOut(Package):
 class Location(BaseModel):
     latitude: float
     longitude: float
+    address: str
 
 class LocationOut(BaseModel):
     id: int
