@@ -9,6 +9,7 @@ import os
 from dotenv import load_dotenv
 from models.models import Package, Location, PackageOut
 from fastapi.middleware.cors import CORSMiddleware
+import json
 # from routing.load import solve_routes
 
 load_dotenv()
@@ -137,8 +138,19 @@ def solve_all():
     # First compute the distance matrix
 
     # Now solve the routes and get the trip locations 
-    trips, trip_indices = solve_routes()
+    # trips, trip_indices = solve_routes()
     # Now insert the trips to the DB, and assign the riders accordingly
+    locations_order = "8.34234,48.23424;8.34423,48.26424;8.36424,48.29424"
+    os.system(f"sh osrm.sh \"{locations_order}\"")
+    input_file = open("result.json")
+    result_data = json.load(input_file)
+    with open("geo_jsons/example_geo.json") as f:
+        geo_json = json.load(f)
+    
+    geo_json["features"][0]["geometry"] = result_data["routes"][0]["geometry"]
+    tour_id = 1
+    with open(f"geo_jsons/{tour_id}_geo.json", 'w') as f:
+        json.dump(geo_json, f)
     return {"status": "ok"}
 
 

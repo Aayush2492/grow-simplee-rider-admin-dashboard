@@ -8,6 +8,7 @@ class Package(BaseModel):
     breadth: int
     height: int
     delivery_date: datetime
+    delivered_time: Union[datetime, None]
     delivery_loc: int
     erroneous : bool = False
     comments : Union[str, None] = None
