@@ -1,17 +1,19 @@
 import React from 'react';
-// import { GoogleMap, LoadScript } from '@react-google-maps/api';
-import { Container } from '@mantine/core';
+import { Container, Flex } from '@mantine/core';
 import RiderNavbar from '../components/RiderNavbar';
 import { MapComponent } from '../components/MapComponent';
 
 export default function RiderPage({}) {
-  // console.log('key', process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY);
   return (
     <>
       <RiderNavbar>
-        <Container p={0}>
-          <MapComponent height={'100vh'} width={'66vw'} />
-        </Container>
+        <div style={{ width: '100vw', height: '100vh', position: 'fixed' }}>
+          <Flex justify="flex-start" align="flex-start" direction="row">
+            <Container>
+              <MapComponent height={'100vh'} width={'100vw'} />
+            </Container>
+          </Flex>
+        </div>
       </RiderNavbar>
     </>
   );

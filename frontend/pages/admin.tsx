@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import Box1 from '../components/Box1';
 import { MapComponent } from '../components/MapComponent';
 import { Container, Flex, Drawer } from '@mantine/core';
 import AdminNavbar from '../components/Admin/AdminNavbar';
 
 function Admin() {
-  const [display, setdisplay] = useState(true);
   const [selectPosition, setSelectPosition] = useState<{ lat: number; lon: number }>({
     lat: 11.9716,
     lon: 77.5946,
