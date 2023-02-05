@@ -8,7 +8,8 @@ from psycopg2.extras import Json, RealDictCursor
 import os
 from dotenv import load_dotenv
 from models.models import Package, Location, PackageOut
-from routing.load import solve_routes
+from fastapi.middleware.cors import CORSMiddleware
+# from routing.load import solve_routes
 
 load_dotenv()
 
@@ -30,6 +31,22 @@ conn = psycopg2.connect(
 print("Opened database successfully!")
 
 app = FastAPI()
+
+origins = [
+    "http://localhost.tiangolo.com",
+    "https://localhost.tiangolo.com",
+    "http://localhost",
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 queries = aiosql.from_path("db", "psycopg2")
 
 
@@ -141,6 +158,9 @@ def viewroute(rider_id: int):
     """
     try:
         result = queries.check_trip(conn, rider_id=rider_id)
+        if result['tour_status'] != None:
+            return {"status": 1 - result['tour_status']}
+
         if result is None:
             raise HTTPException(status_code=404, detail='Trip not assigned or active')
         
@@ -165,7 +185,7 @@ def deliver_item(rider_id: int, object_id: int):
     Marks Object ID as delivered.
     """
     try:
-        results = queries.mark_delivered(conn, rider_id=rider_id, obj_id=object_id)
+        results = queries.mark_delivered(conn, obj_id=object_id)
         conn.commit()
     except Exception as err:
         conn.rollback()

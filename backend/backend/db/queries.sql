@@ -30,3 +30,11 @@ SELECT * FROM rider;
 -- WIP. This should also return trip status, if such a trip exists
 UPDATE rider SET latitude = :latitude AND longitude = :longitude WHERE rider_id = :rider_id;
 
+-- name: check_trip^
+SELECT tour_status FROM tour WHERE assigned_rider = :rider_id AND tour_status != 2;
+
+-- name: accept_trip!
+UPDATE tour SET tour_status = 1 WHERE assigned_rider = :rider_id AND tour_status = 0;
+
+-- name: mark_delivered!
+UPDATE package SET completed = true AND delivered_time = CURRENT_TIMESTAMP WHERE object_id = :obj_id;

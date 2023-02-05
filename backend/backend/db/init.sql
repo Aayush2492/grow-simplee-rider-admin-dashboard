@@ -34,6 +34,7 @@ CREATE TABLE package
     breadth         FLOAT,
     height          FLOAT,
     delivery_date   TIMESTAMP   NOT NULL,
+    delivered_time  TIMESTAMP,   
     delivery_loc    BIGINT      NOT NULL,
     erroneous       BOOL        NOT NULL    DEFAULT true,
     comments        VARCHAR(200),
