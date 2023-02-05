@@ -2,4 +2,4 @@
 *.env
 *.pyc
 result.json
-geo_jsons
+*_geo.json

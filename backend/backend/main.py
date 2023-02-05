@@ -159,7 +159,7 @@ def solve_all():
     os.system(f"sh osrm.sh \"{locations_order}\"")
     input_file = open("result.json")
     result_data = json.load(input_file)
-    with open("geo_jsons/example_geo.json") as f:
+    with open("geo_jsons/geo_example.json") as f:
         geo_json = json.load(f)
     
     geo_json["features"][0]["geometry"] = result_data["routes"][0]["geometry"]
