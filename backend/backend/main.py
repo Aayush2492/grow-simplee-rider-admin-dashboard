@@ -34,7 +34,6 @@ print("Opened database successfully!")
 app = FastAPI()
 
 
-
 queries = aiosql.from_path("db", "psycopg2")
 
 origins = [
@@ -62,14 +61,15 @@ async def add_locations(locations: List[Location]):
     ids = []
     try:
         for loc in locations:
-            results = queries.insert_location(conn, latitude=loc.latitude, longitude=loc.longitude, address=loc.address)
+            results = queries.insert_location(
+                conn, latitude=loc.latitude, longitude=loc.longitude, address=loc.address)
             ids.append(results['loc_id'])
         conn.commit()
     except Exception as e:
         print(e)
         conn.rollback()
         raise HTTPException(status_code=500, detail="Some Error Occured")
-    return {'ids':ids}
+    return {'ids': ids}
 
 
 @app.get("/packages", response_model=List[PackageOut])
@@ -137,7 +137,7 @@ def delete_package(obj_id: int):
 def solve_all():
     # First compute the distance matrix
 
-    # Now solve the routes and get the trip locations 
+    # Now solve the routes and get the trip locations
     # trips, trip_indices = solve_routes()
     # Now insert the trips to the DB, and assign the riders accordingly
     locations_order = "8.34234,48.23424;8.34423,48.26424;8.36424,48.29424"
@@ -146,7 +146,7 @@ def solve_all():
     result_data = json.load(input_file)
     with open("geo_jsons/geo_example.json") as f:
         geo_json = json.load(f)
-    
+
     geo_json["features"][0]["geometry"] = result_data["routes"][0]["geometry"]
     tour_id = 1
     with open(f"geo_jsons/{tour_id}_geo.json", 'w') as f:
@@ -174,11 +174,13 @@ def viewroute(rider_id: int):
             return {"status": 1 - result['tour_status']}
 
         if result is None:
-            raise HTTPException(status_code=404, detail='Trip not assigned or active')
-        
+            raise HTTPException(
+                status_code=404, detail='Trip not assigned or active')
+
     except Exception as err:
         conn.rollback()
         raise HTTPException(status_code=500, detail=str(err))
+
 
 @app.post("/rider/{rider_id}/accept")
 def accept_trip(rider_id: int):

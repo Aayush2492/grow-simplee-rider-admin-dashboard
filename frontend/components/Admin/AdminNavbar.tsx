@@ -99,23 +99,25 @@ export default function AdminNavbar({ children }) {
             opened={active >= 0}
             onClose={() => setActive(-1)}
             title={
-              <>
+              <div style={{ marginLeft: 40 }}>
                 <strong style={{ color: '#2596be' }}>{mockdata[active]?.title}</strong>
                 <Divider size="md" />
-              </>
+              </div>
             }
             padding="xl"
             size="xl"
             style={{ translate: '5%' }}
           >
-            {active === 0 && <AddNewDeliveryDrawer isDelivery={true} />}
-            {active === 1 && <AddNewDeliveryDrawer isDelivery={false} />}
-            {active === 2 && <RidersDrawer />}
-            {active === 3 && <PackagesDrawer />}
-            {active === 4 && <ProfileDrawer />}
+            <div style={{ paddingLeft: 40 }}>
+              {active === 0 && <AddNewDeliveryDrawer isDelivery={true} />}
+              {active === 1 && <AddNewDeliveryDrawer isDelivery={false} />}
+              {active === 2 && <RidersDrawer />}
+              {active === 3 && <PackagesDrawer />}
+              {active === 4 && <ProfileDrawer />}
+            </div>
           </Drawer>
         </>
-        <Navbar height={'100vh'} width={{ base: '5%' }} p={'xs'}>
+        <Navbar height={'100vh'} width={{ base: '75px' }} p={'xs'}>
           <Navbar.Section grow mt={50}>
             <Stack justify="center" spacing={0}>
               {links}
