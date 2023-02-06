@@ -13,6 +13,9 @@ export default function HomePage() {
       <div style={{ position: 'fixed', bottom: '2vh', right: '2vw' }}>
         <ColorSchemeToggle />
       </div>
+      <Welcome />
+
+      {/* <Googlemapscomponent /> */}
     </>
   );
 }
