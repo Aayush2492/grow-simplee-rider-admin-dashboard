@@ -1,12 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, Marker, TileLayer, Popup, GeoJSON, useMap } from 'react-leaflet';
 
 import geoJSONData from '../../data/karnataka_geodata.json';
+import { PositionContext } from '../context';
 
 const icon = L.icon({
-  iconUrl: require('../../public/map.png'),
+  iconUrl: require('public/map.png'),
   iconSize: [38, 38],
 });
 
@@ -16,7 +17,13 @@ function ResetCenterView(props: { selectPosition: null | { lat: number; lon: num
   const map = useMap();
 
   useEffect(() => {
-    if (selectPosition) {
+    if (
+      selectPosition &&
+      selectPosition.lat <= 90 &&
+      selectPosition.lat >= -90 &&
+      selectPosition.lon <= 180 &&
+      selectPosition.lon >= -180
+    ) {
       map.setView(L.latLng(selectPosition?.lat, selectPosition?.lon), map.getZoom(), {
         animate: true,
       });
@@ -26,19 +33,27 @@ function ResetCenterView(props: { selectPosition: null | { lat: number; lon: num
   return null;
 }
 
-export default function Map({
-  height,
-  width,
-  selectPosition,
-}: {
-  height: string;
-  width: string;
-  selectPosition: null | { lat: number; lon: number };
-}) {
-  const locationSelection = [selectPosition?.lat, selectPosition?.lon];
+export default function Map({ height, width }: { height: string; width: string }) {
+  // const [locationSelection, setlocationSelection] = useState([
+  //   selectPosition.lat <= 90 && selectPosition.lat >= -90 ? selectPosition.lat : 12.9716,
+  //   selectPosition.lon <= 180 && selectPosition.lon >= -180 ? selectPosition.lon : 77.5946,
+  // ]);
+
+  // useEffect(() => {
+  //   setlocationSelection([
+  //     selectPosition.lat <= 90 && selectPosition.lat >= -90 ? selectPosition.lat : 12.9716,
+  //     selectPosition.lon <= 180 && selectPosition.lon >= -180 ? selectPosition.lon : 77.5946,
+  //   ]);
+  // }, []);
+
+  const { selectPosition } = useContext(PositionContext);
+
   return (
     <MapContainer
-      center={[12.9716, 77.5946]}
+      center={[
+        selectPosition.lat <= 90 && selectPosition.lat >= -90 ? selectPosition.lat : 12.9716,
+        selectPosition.lon <= 180 && selectPosition.lon >= -180 ? selectPosition.lon : 77.5946,
+      ]}
       zoom={10}
       style={{ height: height, width: width, position: 'fixed', top: 0, left: 0, zIndex: 0 }}
       scrollWheelZoom={true}
@@ -48,9 +63,15 @@ export default function Map({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       {selectPosition && (
-        <Marker position={locationSelection} icon={icon}>
+        <Marker
+          position={[
+            selectPosition.lat <= 90 && selectPosition.lat >= -90 ? selectPosition.lat : 12.9716,
+            selectPosition.lon <= 180 && selectPosition.lon >= -180 ? selectPosition.lon : 77.5946,
+          ]}
+          icon={icon}
+        >
           <Popup>
-            A pretty CSS3 popup. <br /> Easily customizable.
+            Latitude : {selectPosition.lat} <br /> Longitude : {selectPosition.lon}
           </Popup>
         </Marker>
       )}

@@ -23,6 +23,7 @@ import AddNewDeliveryDrawer from './Drawers/AddNewDeliveryDrawer';
 import RidersDrawer from './Drawers/RidersDrawer';
 import PackagesDrawer from './Drawers/PackagesDrawer';
 import ProfileDrawer from './Drawers/ProfileDrawer';
+import { ColorSchemeToggle } from '../ColorSchemeToggle/ColorSchemeToggle';
 
 const useStyles = createStyles((theme) => ({
   link: {
@@ -125,6 +126,8 @@ export default function AdminNavbar({ children }) {
           </Navbar.Section>
           <Navbar.Section>
             <Stack justify="center" spacing={0}>
+              <ColorSchemeToggle />
+              <br />
               <NavbarLink icon={IconLogout} label="Logout" />
             </Stack>
           </Navbar.Section>

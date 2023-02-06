@@ -10,6 +10,7 @@ import {
   Divider,
 } from '@mantine/core';
 import { TablerIcon, IconLogout, IconPackage, IconUser } from '@tabler/icons';
+import { ColorSchemeToggle } from './ColorSchemeToggle/ColorSchemeToggle';
 
 const useStyles = createStyles((theme) => ({
   link: {
@@ -103,6 +104,8 @@ export default function RiderNavbar({ children }) {
           </Navbar.Section>
           <Navbar.Section>
             <Stack justify="center" spacing={0}>
+              <ColorSchemeToggle />
+              <br />
               <NavbarLink icon={IconLogout} label="Logout" />
             </Stack>
           </Navbar.Section>
