@@ -33,26 +33,11 @@ print("Opened database successfully!")
 
 app = FastAPI()
 
-origins = [
-    "http://localhost.tiangolo.com",
-    "https://localhost.tiangolo.com",
-    "http://localhost",
-    "http://localhost:3000",
-]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 queries = aiosql.from_path("db", "psycopg2")
 
 origins = [
-    "http://localhost.tiangolo.com",
-    "https://localhost.tiangolo.com",
     "http://localhost",
     "http://localhost:3000",
 ]
@@ -74,17 +59,17 @@ def read_root():
 @app.post("/location")
 async def add_locations(locations: List[Location]):
     cur = conn.cursor()
-    # insert_query = "INSERT INTO location (latitude, longitude) VALUES (%s, %s)"
-    for loc in locations:
-        # cur.execute(insert_query, (location["latitude"], location["longitude"],))
-        queries.insert_location(conn, latitude=loc.latitude, longitude=loc.longitude, address=loc.address)
-
+    ids = []
     try:
+        for loc in locations:
+            results = queries.insert_location(conn, latitude=loc.latitude, longitude=loc.longitude, address=loc.address)
+            ids.append(results['loc_id'])
         conn.commit()
     except Exception as e:
         print(e)
         conn.rollback()
         raise HTTPException(status_code=500, detail="Some Error Occured")
+    return {'ids':ids}
 
 
 @app.get("/packages", response_model=List[PackageOut])

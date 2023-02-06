@@ -11,8 +11,8 @@ CREATE TABLE location
 CREATE TABLE rider
 (
     rider_id    BIGSERIAL   NOT NULL,
-    name        VARCHAR(50) NOT NULL,
-    contact     DECIMAL     NOT NULL,
+    name        VARCHAR(50) NOT NULL DEFAULT 'Rider',
+    contact     DECIMAL     NOT NULL DEFAULT 0,
 	latitude    FLOAT,
 	longitude   FLOAT,
     PRIMARY KEY (rider_id),

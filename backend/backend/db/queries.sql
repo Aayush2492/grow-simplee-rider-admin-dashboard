@@ -1,5 +1,5 @@
--- name: insert_location!
-INSERT INTO location (latitude, longitude, address) VALUES (:latitude, :longitude, :address);
+-- name: insert_location^
+INSERT INTO location (latitude, longitude, address) VALUES (:latitude, :longitude, :address) RETURNING loc_id;
 
 -- name: get_location_by_id^
 SELECT * FROM location WHERE loc_id = :loc_id;
