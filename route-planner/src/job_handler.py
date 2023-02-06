@@ -76,7 +76,7 @@ if read_initial_routes:
         try:
             initial_routes = json.load(f)
             for vehicle_id in initial_routes:
-                inp["vehicles"][int(vehicle_id) - 1]["initial_route"] = initial_routes[vehicle_id]
+                inp["vehicles"][int(vehicle_id) - 1]["steps"] = initial_routes[vehicle_id]
         except json.decoder.JSONDecodeError as e:
             print("Not processing initial routes")
     initial_routes = dict()
