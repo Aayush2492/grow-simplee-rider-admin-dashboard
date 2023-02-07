@@ -3,9 +3,9 @@
 - The addresses are assumed to be accurate, can be considered points.
 - Around 10% of points can be added dynamically (pickups).
 - Suppose we have `m` drivers and `n` shipments,
-- `m` is in the range of `n/20` to `n/30`
+- `m` is in the range of `n/30` to `n/20`
 - `m` is a whole number
-- `80*80*100` cms are the dimensions of the bags.  
+- `80*80*100` cms and `60*60*100` are the dimensions of the bags.  
 - Object will be of max `l*b*h = 40*40*20` cms and min `3*3*3` cms.  
 
 
