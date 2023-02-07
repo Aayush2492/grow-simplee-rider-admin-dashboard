@@ -7,7 +7,7 @@ import geoJSONData from '../../data/karnataka_geodata.json';
 import { PositionContext } from '../context';
 
 const icon = L.icon({
-  iconUrl: require('public/map.png'),
+  iconUrl: 'map.png',
   iconSize: [38, 38],
 });
 

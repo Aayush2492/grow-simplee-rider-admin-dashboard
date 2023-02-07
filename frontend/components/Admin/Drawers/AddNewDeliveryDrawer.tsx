@@ -84,16 +84,15 @@ export default function AddNewDeliveryDrawer({ isDelivery }) {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(
-            {
-              weight: weight,
-              height: height,
-              breadth: breadth,
-              length: length,
-              delivery_loc: id,
-              delivery_date: toISODate(date),
-            },
-          ),
+          body: JSON.stringify({
+            weight: weight,
+            height: height,
+            breadth: breadth,
+            length: length,
+            delivery_loc: id,
+            delivery_date: toISODate(date),
+            comments: comment,
+          }),
         });
 
         if (!another.ok) {
@@ -112,6 +111,7 @@ export default function AddNewDeliveryDrawer({ isDelivery }) {
   const [breadth, setbreadth] = useState('0');
   const [height, setheight] = useState('0');
   const [date, setdate] = useState();
+  const [comment, setcomment] = useState('');
   return (
     <>
       <form onSubmit={form.onSubmit((values) => handleSubmit())}>
@@ -158,8 +158,8 @@ export default function AddNewDeliveryDrawer({ isDelivery }) {
         <Textarea
           placeholder="Your comment"
           label="Your comment"
-          withAsterisk
-          {...form.getInputProps('comment')}
+          value={comment}
+          onChange={(e) => setcomment(e.target.value)}
         />
         <Center>
           <Button type="submit" mt="sm">

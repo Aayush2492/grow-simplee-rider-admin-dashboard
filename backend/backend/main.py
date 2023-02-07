@@ -161,6 +161,7 @@ def pickup():
     """
     return {"status": "ok"}
 
+
 @app.get("/riders")
 def get_riders():
     """

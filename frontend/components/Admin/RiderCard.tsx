@@ -1,4 +1,6 @@
 import { Card, Text, Badge, Button, Group, List } from '@mantine/core';
+import { PositionContext } from '../context';
+import { useContext } from 'react';
 
 interface Rider {
   id: number;
@@ -9,20 +11,41 @@ interface Rider {
 }
 
 export default function RiderCard(item: Rider) {
+  const { selectPosition, setSelectPosition, BASE_URL } = useContext(PositionContext);
   return (
     <Card shadow="sm" p="lg" radius="md" withBorder style={{ maxWidth: 350, margin: 'auto' }}>
       <Group position="apart" mt="md" mb="xs">
-        <Text>Rider Name: {item.name} </Text>
-        <Text>Rider Contact: {item.contact} </Text>
+        <Text>
+          <b>Rider Name</b>: {item.name}{' '}
+        </Text>
+        <Text>
+          <b>Rider Contact</b>: {item.contact}{' '}
+        </Text>
         <Badge color="pink" variant="light">
           ID : {item.id}
         </Badge>
       </Group>
-      <Text>Current Rider Position</Text>
+      <b>Current Rider Position</b>
       <List>
-        <List.Item>Latitude: {item.latitude}</List.Item>
-        <List.Item>Latitude: {item.longitude}</List.Item>
+        <List.Item>
+          <b>Latitude</b>: {item.latitude}
+        </List.Item>
+        <List.Item>
+          <b>Latitude</b>: {item.longitude}
+        </List.Item>
       </List>
+      <Button
+        variant="light"
+        color="blue"
+        fullWidth
+        mt="md"
+        radius="md"
+        onClick={() =>
+          setSelectPosition({ lat: item.latitude, lon: item.longitude, placename: '' })
+        }
+      >
+        Show on map
+      </Button>
     </Card>
   );
 }
