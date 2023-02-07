@@ -84,7 +84,7 @@ export default function AddNewDeliveryDrawer({ isDelivery }) {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify([
+          body: JSON.stringify(
             {
               weight: weight,
               height: height,
@@ -93,7 +93,7 @@ export default function AddNewDeliveryDrawer({ isDelivery }) {
               delivery_loc: id,
               delivery_date: toISODate(date),
             },
-          ]),
+          ),
         });
 
         if (!another.ok) {
