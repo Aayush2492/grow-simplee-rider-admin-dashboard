@@ -142,28 +142,27 @@ def solve_all():
     # trips, trip_indices = solve_routes()
     # Now insert the trips to the DB, and assign the riders accordingly
     
-    # locations_order = "8.34234,48.23424;8.34423,48.26424;8.36424,48.29424"
-    locations_order = ""
+    
+    df = pd.read_csv('../../route-planner/src/data/info_lat_long.csv')
     with open("../../route-planner/src/jsons/initial_routes.json") as f:
         contents = json.load(f)
-        route1 = contents["1"]
-    df = pd.read_csv('../../route-planner/src/data/info_lat_long.csv')
-    
-    for job in route1:
-        if job["type"] == "job":
-            row = df.iloc[job["id"] - 1]
-            locations_order += "{},{};".format(row["long"], row["lat"])
-    locations_order = locations_order[:-1]
-    os.system(f"sh osrm.sh \"{locations_order}\"")
-    input_file = open("result.json")
-    result_data = json.load(input_file)
-    with open("geo_jsons/geo_example.json") as f:
-        geo_json = json.load(f)
+        for rider in contents.keys():
+            route = contents[rider]
+            locations_order = "77.5946,12.9716;"
+            for job in route:
+                if job["type"] == "job":
+                    row = df.iloc[job["id"] - 1]
+                    locations_order += "{},{};".format(row["long"], row["lat"])
+            locations_order += "77.5946,12.9716"
+            os.system(f"sh osrm.sh \"{locations_order}\"")
+            input_file = open("result.json")
+            result_data = json.load(input_file)
+            with open("geo_jsons/geo_example.json") as f:
+                geo_json = json.load(f)
 
-    geo_json["features"][0]["geometry"] = result_data["routes"][0]["geometry"]
-    tour_id = 1
-    with open(f"geo_jsons/{tour_id}_geo.json", 'w') as f:
-        json.dump(geo_json, f)
+            geo_json["features"][0]["geometry"] = result_data["routes"][0]["geometry"]
+            with open(f"geo_jsons/{rider}_geo.json", 'w') as f:
+                json.dump(geo_json, f)
     return {"status": "ok"}
 
 
