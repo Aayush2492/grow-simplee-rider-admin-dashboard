@@ -21,7 +21,9 @@ export default function AddNewDeliveryDrawer({ isDelivery }) {
   });
 
   const { selectPosition, setSelectPosition, BASE_URL } = useContext(PositionContext);
-
+  function toISODate(dt: Date) {
+    return new Date(dt.getTime() - dt.getTimezoneOffset() * 60000).toISOString();
+  }
   async function handleSubmit() {
     const latitude = selectPosition.lat;
     const longitude = selectPosition.lon;
@@ -40,7 +42,7 @@ export default function AddNewDeliveryDrawer({ isDelivery }) {
       return;
     }
 
-    if (!weight || !length || !height || !breadth) {
+    if (!weight || !length || !height || !breadth || !date) {
       alert('Please fill correctly');
       return;
     }
@@ -72,12 +74,44 @@ export default function AddNewDeliveryDrawer({ isDelivery }) {
     }
 
     const data = await response.json();
-    console.log(data);
+    if (data.ids.length) {
+      // console.log(data.ids[0], toISODate(date));
+      let another;
+      const id = data.ids[0];
+      try {
+        another = await fetch(`${BASE_URL}/package/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify([
+            {
+              weight: weight,
+              height: height,
+              breadth: breadth,
+              length: length,
+              delivery_loc: id,
+              delivery_date: toISODate(date),
+            },
+          ]),
+        });
+
+        if (!another.ok) {
+          throw new Error('Error in fetch location/');
+        }
+      } catch (err) {
+        alert('error caught in fetch location/');
+        console.log(err);
+        return;
+      }
+    }
+    // console.log(data);
   }
   const [weight, setweight] = useState('0');
   const [length, setlength] = useState('0');
   const [breadth, setbreadth] = useState('0');
   const [height, setheight] = useState('0');
+  const [date, setdate] = useState();
   return (
     <>
       <form onSubmit={form.onSubmit((values) => handleSubmit())}>
@@ -113,7 +147,8 @@ export default function AddNewDeliveryDrawer({ isDelivery }) {
         <DatePicker
           placeholder="Delivery date"
           label="Event date"
-          {...form.getInputProps('date')}
+          value={date}
+          onChange={(e) => setdate(e)}
         />
         {/* <TextInput mt="sm" label="Location" placeholder="Location" /> */}
         <br />
