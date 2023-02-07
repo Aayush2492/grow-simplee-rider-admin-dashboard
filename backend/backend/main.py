@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from models.models import Package, Location, PackageOut
 from fastapi.middleware.cors import CORSMiddleware
 import json
+import pandas as pd
 # from routing.load import solve_routes
 
 load_dotenv()
@@ -140,7 +141,19 @@ def solve_all():
     # Now solve the routes and get the trip locations
     # trips, trip_indices = solve_routes()
     # Now insert the trips to the DB, and assign the riders accordingly
-    locations_order = "8.34234,48.23424;8.34423,48.26424;8.36424,48.29424"
+    
+    # locations_order = "8.34234,48.23424;8.34423,48.26424;8.36424,48.29424"
+    locations_order = ""
+    with open("../../route-planner/src/jsons/initial_routes.json") as f:
+        contents = json.load(f)
+        route1 = contents["1"]
+    df = pd.read_csv('../../route-planner/src/data/info_lat_long.csv')
+    
+    for job in route1:
+        if job["type"] == "job":
+            row = df.iloc[job["id"] - 1]
+            locations_order += "{},{};".format(row["long"], row["lat"])
+    locations_order = locations_order[:-1]
     os.system(f"sh osrm.sh \"{locations_order}\"")
     input_file = open("result.json")
     result_data = json.load(input_file)
