@@ -15,7 +15,7 @@ for i in range(N):
     if i % 100 == 0:
         print(i)
 
-# print(data)
+# print(df)
 dmat = dmat.astype(int)
 with open("data/distance_matrix_2000.npy", "wb") as f:
     np.save(f, dmat)
