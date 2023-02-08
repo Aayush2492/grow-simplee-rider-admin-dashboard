@@ -71,6 +71,17 @@ async def add_locations(locations: List[Location]):
         raise HTTPException(status_code=500, detail="Some Error Occured")
     return {'ids': ids}
 
+@app.get('/locations')
+def get_all_packages():
+    """
+    Get the List of All Locations present in the DB
+    """
+    try:
+        results = queries.get_all_locations(conn)
+    except Exception as err:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(err))
+    return results
 
 @app.get("/packages", response_model=List[PackageOut])
 def get_all_packages():
