@@ -63,3 +63,9 @@ CREATE TABLE delivery
     FOREIGN KEY     (item)      REFERENCES package(object_id),
     FOREIGN KEY     (id)        REFERENCES tour(tour_id)
 );
+
+CREATE TABLE addresses
+(
+    id              BIGINT      NOT NULL,
+    address VARCHAR(100)
+);

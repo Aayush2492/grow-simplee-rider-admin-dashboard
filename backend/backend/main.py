@@ -7,7 +7,7 @@ from psycopg2.extras import Json, RealDictCursor
 
 import os
 from dotenv import load_dotenv
-from models.models import Package, Location, PackageOut
+from models.models import Package, Location, PackageOut, Addresses
 from fastapi.middleware.cors import CORSMiddleware
 import json
 # from routing.load import solve_routes
@@ -133,6 +133,22 @@ def delete_package(obj_id: int):
     return {"num_deleted": results}
 
 
+@app.post("/addaddress")
+def addaddress(address: Addresses):
+    """
+    Add possible addresses for autocomplete 
+    """
+    # print(addr)
+    try:
+        results = queries.add_address(conn, **dict(address))
+        conn.commit()
+    except Exception as err:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(err))
+
+    return {"num_added": results}
+
+
 @app.get("/solveall")
 def solve_all():
     # First compute the distance matrix
@@ -174,6 +190,7 @@ def get_all_riders():
         raise HTTPException(status_code=500, detail=str(err))
     return results
 
+
 @app.get("/rider/{rider_id}")
 def get_rider(rider_id: int):
     """
@@ -185,6 +202,7 @@ def get_rider(rider_id: int):
         conn.rollback()
         raise HTTPException(status_code=500, detail=str(err))
     return results
+
 
 @app.get("/rider/{rider_id}/viewtrip")
 def viewroute(rider_id: int):
