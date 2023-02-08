@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import {
   Navbar,
   Drawer,
@@ -11,6 +11,7 @@ import {
 } from '@mantine/core';
 import { TablerIcon, IconLogout, IconPackage, IconUser } from '@tabler/icons';
 import { ColorSchemeToggle } from './ColorSchemeToggle/ColorSchemeToggle';
+import { RiderContext } from './context/RiderContext';
 
 const useStyles = createStyles((theme) => ({
   link: {
@@ -60,6 +61,7 @@ const mockdata = [
 
 export default function RiderNavbar({ children }) {
   const [active, setActive] = useState(0);
+  const { rider, setRider } = useContext(RiderContext);
 
   const links = mockdata.map((link, index) => (
     <NavbarLink
@@ -69,6 +71,11 @@ export default function RiderNavbar({ children }) {
       onClick={() => setActive(index === active ? -1 : index)}
     />
   ));
+
+  useEffect(() => {
+    console.log(window.location.href);
+    console.log('riderID', rider.id);
+  }, []);
 
   return (
     <>
@@ -92,8 +99,15 @@ export default function RiderNavbar({ children }) {
             padding="xl"
             size="xl"
             style={{ translate: '5%' }}
+            overlayOpacity={0}
           >
-            <div style={{ paddingLeft: 40 }}>{active === 0 && <>Hello</>}</div>
+            <div style={{ paddingLeft: 40 }}>
+              {active === 0 && (
+                <>
+                  Hello, {rider.name}, {rider.contact}, {rider.id}
+                </>
+              )}
+            </div>
           </Drawer>
         </>
         <Navbar height={'100vh'} width={{ base: '75px' }} p={'xs'}>
