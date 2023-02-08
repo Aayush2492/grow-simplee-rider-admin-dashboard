@@ -223,6 +223,15 @@ def pickup():
     """
     return {"status": "ok"}
 
+@app.post("/simulate")
+def pickup():
+    # move time by 1 hour
+
+    # package_arrival table update, decement the time by 1 hour
+    # if time is less than 1 hour, mark the package in package table as delivered
+
+    return {"status": "ok"}
+
 
 @app.get("/riders")
 def get_all_riders():
