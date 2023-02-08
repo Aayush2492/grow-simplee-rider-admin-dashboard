@@ -19,6 +19,7 @@ import {
   IconUser,
 } from '@tabler/icons';
 import AddNewDeliveryDrawer from './Drawers/AddNewDeliveryDrawer';
+import styles from '../../css/Box.module.css';
 // import AddNewPickUpDrawer from '../Drawers/AddNewPickUpDrawer';
 import RidersDrawer from './Drawers/RidersDrawer';
 import PackagesDrawer from './Drawers/PackagesDrawer';
@@ -100,13 +101,14 @@ export default function AdminNavbar({ children }) {
             opened={active >= 0}
             onClose={() => setActive(-1)}
             title={
-              <div style={{ marginLeft: 40 }}>
+              <div style={{ marginLeft: 40, overflow: 'hidden' }}>
                 <strong style={{ color: '#2596be' }}>{mockdata[active]?.title}</strong>
                 <Divider size="md" />
               </div>
             }
             padding="xl"
             size="xl"
+            className={styles.insidediv}
             style={{ translate: '5%' }}
           >
             <div style={{ paddingLeft: 40 }}>
@@ -118,7 +120,7 @@ export default function AdminNavbar({ children }) {
             </div>
           </Drawer>
         </>
-        <Navbar height={'100vh'} width={{ base: '75px' }} p={'xs'}>
+        <Navbar height={'100vh'} width={{ base: '75px' }} p={'xs'} style={{ overflow: 'hidden' }}>
           <Navbar.Section grow mt={50}>
             <Stack justify="center" spacing={0}>
               {links}

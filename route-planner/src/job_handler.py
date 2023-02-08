@@ -25,15 +25,15 @@ inp_df = pd.read_csv(PATH_TO_DATA_FILE)
 
 NUM_JOBS = inp_df.shape[0]
 NUM_VEHICLES = NUM_JOBS // 20
-NUM_VEHICLE_TYPE = [NUM_JOBS // 2, NUM_JOBS // 2]
 MAX_VOLUME = [20 * 16 * 16, 20 * 12 * 12]  # 100 * 80 * 80, 100 * 60 * 60
 MAX_OBJECT_SIZE = 8 * 8 * 4  # 40 * 40 * 20
 SPEED_MS = 6.5  # 6.5 m/s = 23.25 km/h
 MAX_TRAVEL_TIME_SEC = 5 * 60 * 60  # 5 hours
+start_coord = [77.5946, 12.9716]
 today = datetime.today().date()
 
+
 # Some states
-# ignored_jobs = [25, 65, 71, 91]
 ignored_jobs = []
 read_initial_routes = False
 write_initial_routes = True
@@ -62,10 +62,12 @@ initial_routes = dict()
 for i in range(NUM_VEHICLES):
     x = {
         "id": i + 1,
-        "start_index": 0,
-        "end_index": 0,
+        # "start_index": 0,
+        # "end_index": 0,
+        "start": start_coord,
+        "end": start_coord,
         "max_travel_time": MAX_TRAVEL_TIME_SEC,
-        "capacity": [MAX_VOLUME[i % 2] - 3 * MAX_OBJECT_SIZE],
+        "capacity": [MAX_VOLUME[i % 2] - MAX_OBJECT_SIZE - MAX_OBJECT_SIZE],
     }
     inp["vehicles"].append(x)
 
@@ -77,8 +79,9 @@ for i, row in enumerate(inp_df.iterrows()):
     day_diff = (datetime.strptime(row[1]["edd"], "%d-%m-%Y").date() - today).days
     cur_amount = 2 ** (int(row[1]["prod_id"].split('_')[1]) % 12)
     x = {
-        "id": i + 1,
-        "location_index": i + 1,
+        "id": i + 1001,
+        # "location_index": i + 1,
+        "location": [row[1]["long"], row[1]["lat"]],
         "delivery": [cur_amount],
     }
     if day_diff < 0:
@@ -93,7 +96,7 @@ for i, row in enumerate(inp_df.iterrows()):
 # Read the distance matrix
 with open(PATH_TO_DISTANCE_MATRIX_FILE, "rb") as f:
     dm = np.load(f)
-    inp["matrices"] = {"car": {"durations": (dm.astype(float) / SPEED_MS).astype(int).tolist()}}
+    # inp["matrices"] = {"car": {"durations": (dm.astype(float) / SPEED_MS).astype(int).tolist()}}
     # inp["matrices"]["car"]["costs"] = dm
 
 print("Time taken after reading distance matrix: ", time.time() - start_time)

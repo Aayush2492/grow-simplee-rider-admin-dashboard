@@ -1,6 +1,12 @@
-import numpy as np
+a, b, c = 8, 8, 4
 
-with open("data/distance_matrix_2000.npy", "rb") as f:
-    dmat = np.load(f).tolist()
+ans = 0
 
-print(dmat)
+for i in [1, 2, 4, 8]:
+    for j in [1, 2, 4, 8]:
+        for k in [1, 2, 4]:
+            if i >= j >= k:
+                ans += i * j * k
+
+print(ans)
+print(8 * 8 * 4)
