@@ -130,3 +130,7 @@
   max-height: 40vh;
   overflow-y: scroll;
 }
+
+.insidediv > div {
+  overflow-y: scroll;
+}

@@ -173,6 +173,18 @@ def pickup():
     """
     return {"status": "ok"}
 
+@app.get("/riders")
+def get_riders():
+    """
+    Get all the riders from the DB
+    """
+    try:
+        results = queries.get_riders(conn)
+    except Exception as err:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(err))
+    return results
+
 
 @app.get("/rider/{rider_id}/viewtrip")
 def viewroute(rider_id: int):
