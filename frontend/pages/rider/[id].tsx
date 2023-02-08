@@ -29,13 +29,37 @@ export default function RiderPage() {
           // redirect to 404 page
           router.push('/404');
         }
-        console.log('Data', data);
-        setRider({ id: data.id, name: data.name, contact: data.contact });
+        // console.log('Data', data);
+        setRider({ id: data.id, name: data.name, contact: data.contact, geoJSON: {} });
       } catch (err) {
         console.log('Error fetching rider data', err);
       }
     };
     fetchRiderInfo();
+
+    const fetchRideGeoJSON = async () => {
+      try {
+        const res = await fetch(BASE_URL + '/rider/' + riderIdFromURL + '/viewtrip');
+
+        if (!res.ok) {
+          throw new Error('Error fetching rider geojson');
+        }
+        const data = await res.json();
+
+        if (!data) {
+          // rider id does not exist in database
+          // redirect to 404 page
+          router.push('/404');
+        }
+        console.log('Data', data);
+        if (data['status'] != -1) {
+          setRider({ ...rider, geoJSON: data });
+        }
+      } catch (err) {
+        console.log('Error fetching rider data', err);
+      }
+    };
+    fetchRideGeoJSON();
   }, []);
 
   return (

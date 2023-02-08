@@ -3,8 +3,9 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, Marker, TileLayer, Popup, GeoJSON, useMap } from 'react-leaflet';
 
-import geoJSONData from '../../data/karnataka_geodata.json';
+// import geoJSONData from '../../data/karnataka_geodata.json';
 import { PositionContext } from '../context';
+import { RiderContext } from '../context/RiderContext';
 
 const icon = L.icon({
   iconUrl: 'map.png',
@@ -34,6 +35,10 @@ function ResetCenterView(props: { selectPosition: null | { lat: number; lon: num
 }
 
 export default function Map({ height, width }: { height: string; width: string }) {
+  const { rider, setRider, BASE_URL } = useContext(RiderContext);
+
+  console.log('Rider', rider);
+  // console.log('geo', geoJSONData);
   // const [locationSelection, setlocationSelection] = useState([
   //   selectPosition.lat <= 90 && selectPosition.lat >= -90 ? selectPosition.lat : 12.9716,
   //   selectPosition.lon <= 180 && selectPosition.lon >= -180 ? selectPosition.lon : 77.5946,
@@ -77,7 +82,7 @@ export default function Map({ height, width }: { height: string; width: string }
       )}
       <ResetCenterView selectPosition={selectPosition} />
       {/* GeoJSON data for each route goes here in JSON format. Use OSRM to get LineString output for shortest route between two points */}
-      {/* <GeoJSON data={geoJSONData} /> */}
+      {/* <GeoJSON data={{}} /> */}
     </MapContainer>
   );
 }
