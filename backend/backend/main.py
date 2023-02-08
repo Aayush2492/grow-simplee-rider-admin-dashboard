@@ -12,7 +12,8 @@ from fastapi.middleware.cors import CORSMiddleware
 import json
 import geocoder
 import pandas as pd
-from routing.load import solve_routes
+from route_planner.load import solve_routes
+import csv
 import datetime
 
 load_dotenv()
@@ -174,6 +175,8 @@ def solve_routes():
     # Add Hub Location !! imp 
     results =  queries.get_undelivered_packages(conn)
 
+    bounding_boxes = [(5,5,5),(10,5,5), (10,10,5), (10,10,10), (20,10,10), (20,20,10), (20,20,20), 
+    (40, 20, 20), (40, 40, 20), (40, 40, 20), (40, 40, 40), (80, 40, 40), (80, 80, 40)]
     input_frame = []
     object_map = {}
     for idx, obj in enumerate(results):
@@ -181,9 +184,31 @@ def solve_routes():
         row['lat'] = obj['longitude']
         row['lon'] = obj['longitude']
         row['id'] = obj['object_id']
-
         delivery_time = datetime.fromtimestamp(obj['delivery_date']).strftime('%y-%m-%d')
         row['edd'] = delivery_time
+        l = float(obj['length'])
+        b = float(obj['height'])
+        h = float(obj['breadth'])
+        dims = [l, b, h]
+        dims.sort()
+        max_dim = dims[2]
+        alias_dims = [20,40,40]
+        for each in bounding_boxes:
+            if each[0] >=  max_dims:
+                alias_dims[0] = each[0]
+                break
+        next_dim = dims[1]
+        for each in bounding_boxes:
+            if each[0] ==  max_dims and each[1] >= next_dim:
+                alias_dims[1] = each[1]
+                break
+        last_dim = dims[0]
+        for each in bounding_boxes:
+            if each[1] ==  max_dims and each[1] == next_dim and each[2] >= last_dim:
+                alias_dims[2] = each[2]
+                break
+        vol = last_dim[0]*last_dim[1]*last_dim[2]
+
         row['volume'] = 32000
         input_frame.append(row)
         object_map[idx] = obj['object_id']
@@ -456,6 +481,12 @@ def gen_trip_geo_json(rider_id: int):
             locations.append([longitude, latitude])
         locations_order += "77.5946,12.9716"
         locations.append([77.5946, 12.9716])
+        with open("geocodes.csv", 'a', encoding="UTF-8") as f:
+            writer = csv.writer(f)
+            writer.writerow([f"{trip_id:>5}", "  latitude", " longitude"])
+            for loc in locations:
+                writer.writerow(["     ", f"{loc[1]:>10}", f"{loc[0]:>10}"])
+            
         os.system(f"sh osrm.sh \"{locations_order}\"")
         input_file = open("result.json")
         result_data = json.load(input_file)
