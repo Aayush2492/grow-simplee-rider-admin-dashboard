@@ -342,6 +342,55 @@ def object_id_trip(object_id: int):
         return {"trip": results["id"]}
     return {"trip": -1}
 
+@app.get("/rider/trip/{rider_id}")
+def gen_trip_geo_json(rider_id: int):
+    """
+    Takes the rider_id and generates the geo json for his/her current trip
+    """
+    try:
+        results = queries.check_trip(conn, rider_id=rider_id)
+        trip_id = results["tour_id"]
+        packages = queries.get_trip_deliveries(conn, trip_id=trip_id)
+        locations_order = "77.5946,12.9716;"
+        locations = [[77.5946, 12.9716]]
+        for row in packages:
+            coordinates = queries.get_latlong(conn, obj_id=row["item"])
+            latitude = coordinates["latitude"]
+            longitude = coordinates["longitude"]
+            locations_order += "{},{};".format(longitude, latitude)
+            locations.append([longitude, latitude])
+        locations_order += "77.5946,12.9716"
+        locations.append([77.5946, 12.9716])
+        os.system(f"sh osrm.sh \"{locations_order}\"")
+        input_file = open("result.json")
+        result_data = json.load(input_file)
+        with open("geo_jsons/geo_example.json") as f:
+            geo_json = json.load(f)
+        
+        geo_json["features"][0]["geometry"] = result_data["routes"][0]["geometry"]
+        for loc in locations:
+            if loc[0] == 77.5946 and loc[1] == 12.9716:
+                marker = {
+                            "type": "Feature",
+                            "geometry": { "type": "Point", "coordinates": loc },
+                            "properties": { "name": "Point" , "marker-color": "#F00"}
+                        }
+            else:
+                marker = {
+                            "type": "Feature",
+                            "geometry": { "type": "Point", "coordinates": loc },
+                            "properties": { "name": "Point" }
+                        }
+            geo_json["features"].append(marker)
+            with open(f"geo_jsons/{trip_id}_geo.json", 'w') as f:
+                json.dump(geo_json, f)
+        
+
+    except Exception as err:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(err))
+    
+    return {"status": "ok"}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

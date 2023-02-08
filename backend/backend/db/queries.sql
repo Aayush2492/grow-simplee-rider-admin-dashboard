@@ -47,3 +47,9 @@ UPDATE tour SET tour_status = 2 WHERE assigned_rider = :rider_id AND tour_status
 
 -- name: get_trip_id^
 SELECT id FROM delivery WHERE item = :object_id;
+
+-- name: get_trip_deliveries
+SELECT item FROM delivery WHERE id = :trip_id;
+
+-- name: get_latlong^
+SELECT latitude, longitude FROM location INNER JOIN package ON location.loc_id = package.delivery_loc WHERE package.object_id = :obj_id;
