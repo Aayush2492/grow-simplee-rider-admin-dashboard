@@ -163,7 +163,7 @@ def pickup():
 
 
 @app.get("/riders")
-def get_riders():
+def get_all_riders():
     """
     Get all the riders from the DB
     """
@@ -174,6 +174,17 @@ def get_riders():
         raise HTTPException(status_code=500, detail=str(err))
     return results
 
+@app.get("/rider/{rider_id}")
+def get_rider(rider_id: int):
+    """
+    Get the details of a particular rider from DB.
+    """
+    try:
+        results = queries.get_rider_by_id(conn, rider_id=rider_id)
+    except Exception as err:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(err))
+    return results
 
 @app.get("/rider/{rider_id}/viewtrip")
 def viewroute(rider_id: int):
