@@ -14,6 +14,8 @@ import geocoder
 import pandas as pd
 import csv
 # from routing.load import solve_routes
+from routing.load import solve_routes
+import datetime
 
 load_dotenv()
 
@@ -168,7 +170,85 @@ def addaddress(address: Addresses):
     return {"num_added": results}
 
 
-@app.get("/solveall")
+@app.get('/solve_routes')
+def solve_routes():
+    # First retrieve objects from DB 
+    # Add Hub Location !! imp 
+    results =  queries.get_undelivered_packages(conn)
+
+    input_frame = []
+    object_map = {}
+    for idx, obj in enumerate(results):
+        row = {}
+        row['lat'] = obj['longitude']
+        row['lon'] = obj['longitude']
+        row['id'] = obj['object_id']
+
+        delivery_time = datetime.fromtimestamp(obj['delivery_date']).strftime('%y-%m-%d')
+        row['edd'] = delivery_time
+        row['volume'] = 32000
+        input_frame.append(row)
+        object_map[idx] = obj['object_id']
+
+    # rider_map 
+    rider_res = queries.get_riders(conn)
+    bags_res = queries.get_bags(conn)
+
+    min_len = min(len(rider_res), min(bags_res))
+
+    rider_bag_map = {}
+    vehicle_indices = []
+    for i in range(min_len):
+        print(i)
+        # True is for the bigger bag
+        # 
+        if bags_res[i]['bag_type'] is True:
+            vehicle_indices.append(i*2)
+            rider_bag_map[i*2] = (bags_res[i]['bag_id'], rider_res[i]['rider_id'])
+        else:
+            vehicle_indices.append(2*i + 1)
+            rider_bag_map[i*2 + 1] = (bags_res[i]['bag_id'], rider_res[i]['rider_id'])
+    # now give as input vehicle_indices, and input_frame
+
+    
+    # output preprocessing 
+    # call my load function
+    vehicles , outputs = solve_routes()
+
+    # insert tours
+    trip_rider_map = {}
+
+    # TODO: Commit all at once to prevent race
+    for each in vehicles.keys():
+        # TODO: replace rider_id with actual rider_id 
+        try:
+            bag_id = rider_bag_map[each][0]
+            rider_id = rider_bag_map[each][1]
+            results = queries.insert_tour(conn, rider_id=rider_id ,bag_id=bag_id, tour_status=0)
+            conn.commit()
+            trip_id = results['id']
+            trip_rider_map[each] = (trip_id, rider_id)
+        except Exception as err:
+            conn.rollback()
+            raise HTTPException(status_code=500, detail=str(err))
+
+    # insert objects
+    for each in outputs:
+        alias = each[0]
+        obj_id = each[1]
+        try:
+            queries.insert_delivery_item(conn, tour_id=trip_rider_map[each], item=obj_id,delivery_order=each[2])
+            conn.commit()
+        except Exception as err:
+            conn.rollback()
+            raise HTTPException(status_code=500, detail=str(err))
+    return  {'status':'ok'}
+            
+    # Now solve the routes and get the trip locations
+    # trips, trip_indices = solve_routes()
+    # Now insert the trips to the DB, and assign the riders accordingly
+
+@app.get("/oldsolveall")
 def solve_all():
     # First compute the distance matrix
 

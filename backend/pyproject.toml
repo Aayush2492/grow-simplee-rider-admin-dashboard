@@ -11,6 +11,8 @@ fastapi = "^0.89.0"
 uvicorn = {extras = ["standard"], version = "^0.20.0"}
 aiosql = "^7.2"
 python-dotenv = "^0.21.1"
+geocoder = "^1.38.1"
+pandas = "^1.5.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
