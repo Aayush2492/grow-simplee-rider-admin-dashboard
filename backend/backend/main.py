@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from models.models import Package, Location, PackageOut, Addresses
 from fastapi.middleware.cors import CORSMiddleware
 import json
+import geocoder
 # from routing.load import solve_routes
 
 load_dotenv()
@@ -140,7 +141,12 @@ def addaddress(address: Addresses):
     """
     # print(addr)
     try:
-        results = queries.add_address(conn, **dict(address))
+        g = geocoder.bing(address, key='Ag3_-x9aIPCQxhENQQcDUeFWirDR4tvRr1YUArJF9nrvnUnBv2wis5jue73E_Nxe')
+        results = g.json
+        if results:
+            lat = results['lat']
+            lng = results['lng']
+            results = queries.insert_location(conn, latitude=lat, longitude=lng, address=address)
         conn.commit()
     except Exception as err:
         conn.rollback()
