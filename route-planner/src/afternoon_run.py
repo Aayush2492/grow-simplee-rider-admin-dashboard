@@ -51,7 +51,7 @@ def update_assigned_vehicle_and_add_to_jobs(_route, _vehicle_id):
         if step["type"] == "job" and step["arrival"] <= time_diff.total_seconds():
             assigned_vehicle[step["job"]] = -2  # -2 means delivered
             continue
-        elif step["type"] == "job" and step["id"] < 5000:
+        elif step["type"] == "job" and step["id"] <= 5000:
             # This is a delivery and HAS to be performed by the current vehicle
             inp["jobs"].append({
                 "id": step["id"],
@@ -60,7 +60,7 @@ def update_assigned_vehicle_and_add_to_jobs(_route, _vehicle_id):
                 "skills": [int(_vehicle_id)],  # This HAS to be done by this vehicle
                 "priority": 1000,  # This HAS to be done
             })
-        elif step["type"] == "job" and step["id"] >= 5000:
+        elif step["type"] == "job" and step["id"] > 5000:
             # This is an undone pickup and hence can be procrastinated
             # Unassign the vehicle to this pickup to compute it together with the rest
             assigned_vehicle[step["id"]] = -1  # -1 means not assigned
