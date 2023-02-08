@@ -26,6 +26,9 @@ SELECT * FROM rider WHERE rider_id = :rider_id;
 -- name: get_riders
 SELECT * FROM rider;
 
+-- name: get_bags
+SELECT * FROM bag ORDER BY bag_type DESC;
+
 -- name: update_loc
 -- WIP. This should also return trip status, if such a trip exists
 UPDATE rider SET latitude = :latitude AND longitude = :longitude WHERE rider_id = :rider_id;
@@ -47,3 +50,12 @@ UPDATE tour SET tour_status = 2 WHERE assigned_rider = :rider_id AND tour_status
 
 -- name: get_trip_id^
 SELECT id FROM delivery WHERE item = :object_id;
+
+-- name: insert_tour^
+INSERT INTO tour(assigned_rider, assigned_bag, tour_status) VALUES(:rider_id, :bag_id, :tour_status);
+
+-- name: insert_delivery_item
+INSERT INTO delivery(id, item, delivery_order) VALUES(:tour_id, :item, :delivery_order)
+
+-- name: get_undelivered_packages
+SELECT * FROM package LEFT JOIN location ON package.delivery_loc = location.loc_id WHERE package.completed = False ORDER BY location.loc_id;
