@@ -195,15 +195,22 @@ def viewroute(rider_id: int):
     try:
         result = queries.check_trip(conn, rider_id=rider_id)
         if result['tour_status'] != None:
-            return {"status": 1 - result['tour_status']}
+            with open("geo_jsons/{}_geo.json".format(result["tour_id"])) as f:
+                geo_json = json.load(f)
+            return {
+                    "status": result['tour_status'],
+                    "geo-json": geo_json
+                    }
 
         if result is None:
-            raise HTTPException(
-                status_code=404, detail='Trip not assigned or active')
+            return {"status": -1}
+            # raise HTTPException(
+            #     status_code=404, detail='Trip not assigned or active')
 
     except Exception as err:
         conn.rollback()
-        raise HTTPException(status_code=500, detail=str(err))
+        # raise HTTPException(status_code=500, detail=str(err))
+        return {"status": -1}
 
 
 @app.post("/rider/{rider_id}/accept")
