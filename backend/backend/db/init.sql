@@ -64,8 +64,9 @@ CREATE TABLE delivery
     FOREIGN KEY     (id)        REFERENCES tour(tour_id)
 );
 
-CREATE package_arrival (
+CREATE TABLE package_arrival 
+(
     object_id       BIGINT      NOT NULL,
     arrival_time    BIGINT   NOT NULL,
-    FOREIGN KEY     (object_id) REFERENCES package(object_id
-)
+    FOREIGN KEY     (object_id) REFERENCES package(object_id)
+);

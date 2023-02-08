@@ -1,11 +1,27 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { MapComponent } from '../components/MapComponent';
 import { Container, Flex, Drawer } from '@mantine/core';
 import AdminNavbar from '../components/Admin/AdminNavbar';
 import PositionProvider from '../components/context';
+import { RiderContext } from '../components/context/RiderContext';
 
 function Admin() {
   // console.log(selectPosition);
+  const { rider, setRider, BASE_URL } = useContext(RiderContext);
+
+  useEffect(() => {
+    let sampleGeoJSON = {};
+    sampleGeoJSON['type'] = 'FeatureCollection';
+    sampleGeoJSON['geometry'] = {
+      type: 'Point',
+      coordinates: [125.6, 10.1],
+    };
+    sampleGeoJSON['properties'] = {
+      name: 'Dinagat Islands',
+    };
+    setRider({ ...rider, geoJSON: sampleGeoJSON });
+  }, []);
+
   return (
     <PositionProvider>
       <AdminNavbar>
