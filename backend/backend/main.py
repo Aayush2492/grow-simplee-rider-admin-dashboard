@@ -271,6 +271,54 @@ def solve_routes():
     # trips, trip_indices = solve_routes()
     # Now insert the trips to the DB, and assign the riders accordingly
 
+@app.get("/submission")
+def solve_submission():
+    with open("../../route-planner/src/small_sample/post_morn_data.json") as f:
+        contents = json.load(f)
+        routes = contents["routes"]
+        for rider in routes.keys():
+            route = routes[rider]
+            locations_order = "77.5946,12.9716;"
+            locations = [[77.5946, 12.9716]]
+            for job in route:
+                if job["type"] == "job":
+                    job_id = job["id"]
+                    coordinates = contents["package_info"][f"{job_id}"]["location"]
+                    locations_order += "{},{};".format(coordinates[0], coordinates[1])
+                    locations.append([coordinates[0], coordinates[1]])
+            locations_order += "77.5946,12.9716"
+            locations.append([77.5946, 12.9716])
+
+            with open("geocodes.csv", 'a', encoding="UTF-8") as f:
+                writer = csv.writer(f)
+                writer.writerow([f"{rider:>5}", "       latitude", "      longitude"])
+                for loc in locations:
+                    writer.writerow(["     ", f"{loc[1]:>15}", f"{loc[0]:>15}"])
+            
+            os.system(f"sh osrm.sh \"{locations_order}\"")
+            input_file = open("result.json")
+            result_data = json.load(input_file)
+            with open("geo_jsons/geo_example.json") as f:
+                geo_json = json.load(f)
+
+            geo_json["features"][0]["geometry"] = result_data["routes"][0]["geometry"]
+            for loc in locations:
+                if loc[0] == 77.5946 and loc[1] == 12.9716:
+                    marker = {
+                            "type": "Feature",
+                            "geometry": { "type": "Point", "coordinates": loc },
+                            "properties": { "name": "Point" , "marker-color": "#F00"}
+                    }
+                else:
+                    marker = {
+                            "type": "Feature",
+                            "geometry": { "type": "Point", "coordinates": loc },
+                            "properties": { "name": "Point" }
+                    }
+                geo_json["features"].append(marker)
+            with open(f"geo_jsons/{rider}_geo.json", 'w') as f:
+                json.dump(geo_json, f)
+            
 @app.get("/oldsolveall")
 def solve_all():
     # First compute the distance matrix
