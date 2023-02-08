@@ -53,3 +53,6 @@ SELECT item FROM delivery WHERE id = :trip_id;
 
 -- name: get_latlong^
 SELECT latitude, longitude FROM location INNER JOIN package ON location.loc_id = package.delivery_loc WHERE package.object_id = :obj_id;
+
+--name: check_delivery^
+SELECT completed FROM package WHERE object_id = :obj_id;

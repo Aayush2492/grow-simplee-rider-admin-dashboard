@@ -363,11 +363,13 @@ def gen_trip_geo_json(rider_id: int):
         locations_order = "77.5946,12.9716;"
         locations = [[77.5946, 12.9716]]
         for row in packages:
-            coordinates = queries.get_latlong(conn, obj_id=row["item"])
-            latitude = coordinates["latitude"]
-            longitude = coordinates["longitude"]
-            locations_order += "{},{};".format(longitude, latitude)
-            locations.append([longitude, latitude])
+            status = queries.check_delivery(conn, obj_id=row["item"])
+            if not status["completed"]:
+                coordinates = queries.get_latlong(conn, obj_id=row["item"])
+                latitude = coordinates["latitude"]
+                longitude = coordinates["longitude"]
+                locations_order += "{},{};".format(longitude, latitude)
+                locations.append([longitude, latitude])
         locations_order += "77.5946,12.9716"
         locations.append([77.5946, 12.9716])
         os.system(f"sh osrm.sh \"{locations_order}\"")
