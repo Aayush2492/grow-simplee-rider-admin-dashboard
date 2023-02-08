@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "leaflet-control-geocoder": "^2.4.0",
+    "read-excel-file": "^5.6.0"
+  }
+}

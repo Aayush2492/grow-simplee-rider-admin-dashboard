@@ -1,0 +1,14 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+
+      // Paste the geometry object here obtained in result.json after running bash.sh
+      "geometry": {},
+      "properties": {
+        "prop0": "value0"
+      }
+    }
+  ]
+}

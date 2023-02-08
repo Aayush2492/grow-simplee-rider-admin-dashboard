@@ -1,0 +1,21 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+@-moz-document url-prefix() {
+  html {
+    scrollbar-width: none;
+  }
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+body {
+  -ms-overflow-style: none;
+}
