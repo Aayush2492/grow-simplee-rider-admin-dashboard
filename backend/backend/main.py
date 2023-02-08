@@ -149,11 +149,14 @@ def solve_all():
         for rider in contents.keys():
             route = contents[rider]
             locations_order = "77.5946,12.9716;"
+            locations = [[77.5946, 12.9716]]
             for job in route:
                 if job["type"] == "job":
                     row = df.iloc[job["id"] - 1]
                     locations_order += "{},{};".format(row["long"], row["lat"])
+                    locations.append([row["long"], row["lat"]])
             locations_order += "77.5946,12.9716"
+            locations.append([77.5946, 12.9716])
             os.system(f"sh osrm.sh \"{locations_order}\"")
             input_file = open("result.json")
             result_data = json.load(input_file)
@@ -161,6 +164,20 @@ def solve_all():
                 geo_json = json.load(f)
 
             geo_json["features"][0]["geometry"] = result_data["routes"][0]["geometry"]
+            for loc in locations:
+                if loc[0] == 77.5946 and loc[1] == 12.9716:
+                    marker = {
+                            "type": "Feature",
+                            "geometry": { "type": "Point", "coordinates": loc },
+                            "properties": { "name": "Point" , "marker-color": "#F00"}
+                    }
+                else:
+                    marker = {
+                            "type": "Feature",
+                            "geometry": { "type": "Point", "coordinates": loc },
+                            "properties": { "name": "Point" }
+                    }
+                geo_json["features"].append(marker)
             with open(f"geo_jsons/{rider}_geo.json", 'w') as f:
                 json.dump(geo_json, f)
     return {"status": "ok"}
