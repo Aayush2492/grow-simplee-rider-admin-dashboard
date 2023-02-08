@@ -12,10 +12,10 @@ import {
   Checkbox,
   Anchor,
   Stack,
+  Center,
 } from '@mantine/core';
 import { IconBrandGoogle } from '@tabler/icons';
 import { IconBrandTwitter } from '@tabler/icons';
-import { Center } from '@mantine/core/lib/Center';
 
 export default function Login(props: PaperProps) {
   const [type, toggle] = useToggle(['login', 'register']);
@@ -35,9 +35,11 @@ export default function Login(props: PaperProps) {
 
   return (
     <Paper radius="md" style={{ maxWidth: 400, maxHeight: 600 }} p="xl" withBorder {...props}>
-      <Text size="lg" weight={500}>
-        Welcome to Mantine, {type} with
-      </Text>
+      <Center>
+        <Text size="lg" weight={500}>
+          Welcome, {type} with
+        </Text>
+      </Center>
 
       <Group grow mb="md" mt="md">
         <IconBrandGoogle radius="xl">Google</IconBrandGoogle>

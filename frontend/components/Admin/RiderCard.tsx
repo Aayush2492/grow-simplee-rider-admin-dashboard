@@ -13,25 +13,24 @@ interface Rider {
 export default function RiderCard(item: Rider) {
   const { selectPosition, setSelectPosition, BASE_URL } = useContext(PositionContext);
   return (
-    <Card shadow="sm" p="lg" radius="md" withBorder style={{ maxWidth: 350, margin: 'auto' }}>
+    <Card shadow="sm" p="lg" radius="md" withBorder style={{ maxWidth: 350, margin: '0' }}>
       <Group position="apart" mt="md" mb="xs">
         <Text>
-          <b>Rider Name</b>: {item.name}{' '}
+          <b style={{ color: '#2596be' }}>Rider Name</b>: {item.name}{' '}
         </Text>
         <Text>
-          <b>Rider Contact</b>: {item.contact}{' '}
+          <b style={{ color: '#2596be' }}>Rider Contact</b>: {item.contact}{' '}
         </Text>
         <Badge color="pink" variant="light">
           ID : {item.id}
         </Badge>
       </Group>
-      <b>Current Rider Position</b>
       <List>
         <List.Item>
-          <b>Latitude</b>: {item.latitude}
+          <b style={{ color: '#2596be' }}>Latitude</b>: {item.latitude}
         </List.Item>
         <List.Item>
-          <b>Latitude</b>: {item.longitude}
+          <b style={{ color: '#2596be' }}>Longitude</b>: {item.longitude}
         </List.Item>
       </List>
       <Button

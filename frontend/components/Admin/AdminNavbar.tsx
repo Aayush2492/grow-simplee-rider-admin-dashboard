@@ -102,7 +102,9 @@ export default function AdminNavbar({ children }) {
             onClose={() => setActive(-1)}
             title={
               <div style={{ marginLeft: 40, overflow: 'hidden' }}>
-                <strong style={{ color: '#2596be' }}>{mockdata[active]?.title}</strong>
+                <strong style={{ color: '#2596be', fontSize: '20px' }}>
+                  {mockdata[active]?.title}
+                </strong>
                 <Divider size="md" />
               </div>
             }

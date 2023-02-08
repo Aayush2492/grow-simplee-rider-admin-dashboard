@@ -25,7 +25,7 @@ export default function RidersDrawer() {
     <div>
       {riders.map((item) => {
         return (
-          <div>
+          <>
             <RiderCard
               name={item.name}
               contact={item.contact}
@@ -35,9 +35,31 @@ export default function RidersDrawer() {
               key={item.rider_id}
             />
             <br />
-          </div>
+          </>
         );
       })}
+      <>
+        <RiderCard
+          name={'Prachodhan Keerti Das'}
+          contact={9986012301}
+          longitude={'77.123'}
+          latitude={'12.123'}
+          id={4}
+          key={4}
+        />
+        <br />
+      </>
+      <>
+        <RiderCard
+          name={'Rachit Kothmansu'}
+          contact={9981012301}
+          longitude={'73.123'}
+          latitude={'11.123'}
+          id={18}
+          key={18}
+        />
+        <br />
+      </>
     </div>
   );
 }

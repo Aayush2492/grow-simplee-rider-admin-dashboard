@@ -24,18 +24,44 @@ export default function PackagesDrawer() {
 
   return (
     <div>
+      <div>
+        <Packagecard
+          weight={'12 kg'}
+          height={'10 cm'}
+          breadth={'17 cm'}
+          length={'12 cm'}
+          expdate={'2023-08-12'}
+          exptime={''}
+          id={34}
+          key={34}
+        />
+        <br />
+      </div>
+      <div>
+        <Packagecard
+          weight={'13 kg'}
+          height={'23 cm'}
+          breadth={'45 cm'}
+          length={'12 cm'}
+          expdate={'2023-08-11'}
+          exptime={''}
+          id={65}
+          key={65}
+        />
+        <br />
+      </div>
       {packages.map((item) => {
         return (
           <div>
             <Packagecard
-              weight={item.weight}
-              height={item.height}
-              breadth={item.breadth}
-              length={item.length}
-              expdate={item.delivery_date}
+              weight={'23 kg'}
+              height={'26 cm'}
+              breadth={'35 cm'}
+              length={'22 cm'}
+              expdate={'2023-08-12'}
               exptime={''}
-              id={item.delivery_loc}
-              key={item.delivery_loc}
+              id={65}
+              key={65}
             />
             <br />
           </div>
