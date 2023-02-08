@@ -263,6 +263,21 @@ def update_loc(rider_id: int, latitude: float, longitude: float):
 
     return {"status": results}
 
+@app.get("/trip/{object_id}")
+def object_id_trip(object_id: int):
+    """
+    Returns the trip id in which the object will be delivered if it has been assigned a trip already
+    Returns -1 if the object has not been assigned to any trip yet
+    """
+    try:
+        results = queries.get_trip_id(conn, object_id=object_id)
+    except Exception as err:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(err))
+    if results != None:
+        return {"trip": results["id"]}
+    return {"trip": -1}
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

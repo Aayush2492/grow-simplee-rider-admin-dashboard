@@ -44,3 +44,6 @@ SELECT COUNT(*) FROM delivery WHERE id = :tour_id AND delivery_order > (SELECT d
 
 -- name: complete_trip!
 UPDATE tour SET tour_status = 2 WHERE assigned_rider = :rider_id AND tour_status = 1;
+
+-- name: get_trip_id^
+SELECT id FROM delivery WHERE item = :object_id;
