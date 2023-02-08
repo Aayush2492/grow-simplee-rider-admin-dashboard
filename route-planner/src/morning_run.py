@@ -38,8 +38,8 @@ routes = dict()
 # For now, we just assume that all jobs are in one cluster
 delivery_clusters = {
     "1": {
-        "vehicles": [i for i in range(1, number_vehicles + 1)],
-        "deliveries": [i for i in range(1, number_deliveries + 1)]
+        "vehicles": [str(i) for i in range(1, number_vehicles + 1)],
+        "deliveries": [str(i) for i in range(1, number_deliveries + 1)]
     }
 }
 
@@ -56,30 +56,32 @@ for cluster_no, cluster in delivery_clusters.items():
     inp["jobs"] = list()
 
     # Create vehicles
-    for i in cluster["vehicles"]:
+    for vehicle_id in cluster["vehicles"]:
         inp["vehicles"].append({
-            "id": i,
+            "id": int(vehicle_id),
             "start": hub_coord,
             "end": hub_coord,
             "max_travel_time": int((end_time - datetime.now()).total_seconds()),
-            "capacity": [MAX_VOLUME[i % 2] - MAX_OBJECT_SIZE - MAX_OBJECT_SIZE],
+            "capacity": [MAX_VOLUME[int(vehicle_id) % 2] - MAX_OBJECT_SIZE - MAX_OBJECT_SIZE],
         })
 
     # Create jobs
     for delivery_id in cluster["deliveries"]:
-        edd = datetime.strptime(del_df["edd"][delivery_id], edd_format).date()
-        inp["jobs"].append({
-            "id": delivery_id,
-            "location": [float(del_df["lon"][delivery_id]), float(del_df["lat"][delivery_id])],
-            "delivery": [int(del_df["volume"][delivery_id] / 125)],
-            "priority": 15 if edd < today else 30 if edd == today else max(2, 10 - (edd - today).days),
-        })
+        edd = datetime.strptime(del_df["edd"][int(delivery_id)], edd_format).date()
 
         package_info[delivery_id] = {
             "type": "delivery",
             "done": False,
-            "assigned_vehicle": -1
+            "assigned_vehicle": -1,
+            "location": [float(del_df["lon"][int(delivery_id)]), float(del_df["lat"][int(delivery_id)])]
         }
+
+        inp["jobs"].append({
+            "id": int(delivery_id),
+            "location": package_info[delivery_id]["location"],
+            "delivery": [int(del_df["volume"][int(delivery_id)] / 125)],
+            "priority": 15 if edd < today else 30 if edd == today else max(2, 10 - (edd - today).days),
+        })
 
     # Write inp to file
     with open(PATH_TO_INPUT_FILE, "w") as f:
@@ -94,12 +96,12 @@ for cluster_no, cluster in delivery_clusters.items():
 
     # Save to routes and update assigned_vehicle
     for route in out["routes"]:
-        vehicle_id = route["vehicle"]
+        vehicle_id = str(route["vehicle"])
         routes[vehicle_id] = list()
         for step in route["steps"]:
             routes[vehicle_id].append({"type": step["type"], "arrival": step["arrival"]})
             if step["type"] == "job":
-                package_info[int(step["id"])]["assigned_vehicle"] = vehicle_id
+                package_info[str(step["id"])]["assigned_vehicle"] = vehicle_id
                 routes[vehicle_id][-1]["id"] = step["job"]
 
 

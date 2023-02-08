@@ -45,8 +45,8 @@ hub_coord = del_df["lon"][0], del_df["lat"][0]
 
 
 def update_assigned_vehicle_and_add_to_jobs(_route, _vehicle_id):
-    _steps = list({"type": "start"})
-    for _step in _route["steps"]:
+    _steps = [{"type": "start"}]
+    for _step in _route:
         if _step["type"] == "job":
             _id = str(_step["id"])
             if _step["arrival"] <= time_diff.total_seconds():
@@ -54,7 +54,7 @@ def update_assigned_vehicle_and_add_to_jobs(_route, _vehicle_id):
                 package_info[_id]["done"] = False
                 continue
             elif package_info[_id]["type"] == "delivery":
-                package_info[_id] = _vehicle_id
+                package_info[_id]["assigned_vehicle"] = _vehicle_id
                 inp["jobs"].append({
                     "id": _step["id"],
                     "location": [float(del_df["lon"][_step["id"]]), float(del_df["lat"][_step["id"]])],
@@ -62,7 +62,6 @@ def update_assigned_vehicle_and_add_to_jobs(_route, _vehicle_id):
                     "skills": [int(_vehicle_id)],  # This HAS to be done by this vehicle
                     "priority": 1000,  # This HAS to be done
                 })
-                _steps.append(_step)
             elif package_info[_id]["type"] == "pickup":
                 # This is an undone pickup and hence can be procrastinated
                 # Unassign the vehicle to this pickup to compute it together with the rest
@@ -82,9 +81,8 @@ def update_assigned_vehicle_and_add_to_jobs(_route, _vehicle_id):
 # For now, we just assume that all jobs are in one cluster
 pickup_clusters = {
     "1": {
-        "vehicles": [i for i in range(1, number_vehicles + 1)],
-        "deliveries": [i for i in range(1, number_deliveries + 1)],
-        "pickups": [i for i in range(1, number_pickups + 1)]
+        "vehicles": [str(i) for i in range(1, number_vehicles + 1)],
+        "pickups": [str(i) for i in range(1, number_pickups + 1)]
     }
 }
 
@@ -97,12 +95,19 @@ for cluster_no, cluster in pickup_clusters.items():
 
     # Create jobs for pickups
     for pickup_id in cluster["pickups"]:
-        if package_info[str(pickup_id)] == -2:  # Already delivered
+        if pickup_id in package_info and package_info[str(pickup_id)]["done"]:  # Already delivered
             continue
+        elif pickup_id not in package_info:
+            package_info[str(pickup_id)] = {
+                "type": "pickup",
+                "assigned_vehicle": -1,
+                "done": False,
+                "location": [float(del_df["lon"][int(pickup_id)]), float(del_df["lat"][int(pickup_id)])]
+            }
         inp["jobs"].append({
             "id": int(pickup_id),
-            "location": [float(pic_df["lon"][pickup_id]), float(pic_df["lat"][pickup_id])],
-            "pickup": [int(pic_df["volume"][pickup_id] / 125)],
+            "location": package_info[str(pickup_id)]["location"],
+            "pickup": [int(pic_df["volume"][int(pickup_id)] / 125)],
             "priority": 3,
         })
 
@@ -113,14 +118,16 @@ for cluster_no, cluster in pickup_clusters.items():
             "start": hub_coord,  # TODO change to pickup location
             "end": hub_coord,
             "max_travel_time": int((end_time - cur_time).total_seconds()),
-            "capacity": [MAX_VOLUME[vehicle_id % 2] - MAX_OBJECT_SIZE],
-            "skills": [vehicle_id]
+            "capacity": [MAX_VOLUME[int(vehicle_id) % 2] - MAX_OBJECT_SIZE],
+            "skills": [int(vehicle_id)]
         })
 
         if str(vehicle_id) in routes:
-            steps = update_assigned_vehicle_and_add_to_jobs(routes[vehicle_id], vehicle_id)
+            steps = update_assigned_vehicle_and_add_to_jobs(routes[str(vehicle_id)], vehicle_id)
             if len(steps) > 2:
                 inp["vehicles"][-1]["steps"] = steps
+                _id = str(steps[1]["id"])
+                inp["vehicles"][-1]["start"] = package_info[_id]["location"]
 
     # Write inp to file
     with open(PATH_TO_INPUT_FILE, "w") as f:
