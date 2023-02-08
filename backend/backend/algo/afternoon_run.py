@@ -164,6 +164,7 @@ def afternoon_run(PATH_TO_DELIVERY_DATA=_PATH_TO_DELIVERY_DATA,
     with open(PATH_TO_POST_NOON_DATA, "w") as f:
         d = dict()
         d["start_time"] = start_time.__str__()
+        d["package_info"] = package_info
         d["routes"] = new_routes
         json.dump(d, f)
 
