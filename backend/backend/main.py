@@ -12,6 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import json
 import geocoder
 import pandas as pd
+import csv
 # from routing.load import solve_routes
 
 load_dotenv()
@@ -377,6 +378,12 @@ def gen_trip_geo_json(rider_id: int):
             locations.append([longitude, latitude])
         locations_order += "77.5946,12.9716"
         locations.append([77.5946, 12.9716])
+        with open("geocodes.csv", 'a', encoding="UTF-8") as f:
+            writer = csv.writer(f)
+            writer.writerow([f"{trip_id:>5}", "  latitude", " longitude"])
+            for loc in locations:
+                writer.writerow(["     ", f"{loc[1]:>10}", f"{loc[0]:>10}"])
+            
         os.system(f"sh osrm.sh \"{locations_order}\"")
         input_file = open("result.json")
         result_data = json.load(input_file)
