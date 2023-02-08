@@ -230,6 +230,13 @@ def pickup():
     # package_arrival table update, decement the time by 1 hour
     # if time is less than 1 hour, mark the package in package table as delivered
 
+    # mark the tour as completed if all packages are delivered
+
+    # update the rider table with new lat long
+
+    # UPDATE package_arrival SET arrival_time = arrival_time - 3600;
+    # UPDATE package SET completed = true WHERE package_id IN (SELECT package_id FROM package_arrival WHERE arrival_time < 0);
+
     return {"status": "ok"}
 
 
@@ -363,13 +370,11 @@ def gen_trip_geo_json(rider_id: int):
         locations_order = "77.5946,12.9716;"
         locations = [[77.5946, 12.9716]]
         for row in packages:
-            status = queries.check_delivery(conn, obj_id=row["item"])
-            if not status["completed"]:
-                coordinates = queries.get_latlong(conn, obj_id=row["item"])
-                latitude = coordinates["latitude"]
-                longitude = coordinates["longitude"]
-                locations_order += "{},{};".format(longitude, latitude)
-                locations.append([longitude, latitude])
+            coordinates = queries.get_latlong(conn, obj_id=row["item"])
+            latitude = coordinates["latitude"]
+            longitude = coordinates["longitude"]
+            locations_order += "{},{};".format(longitude, latitude)
+            locations.append([longitude, latitude])
         locations_order += "77.5946,12.9716"
         locations.append([77.5946, 12.9716])
         os.system(f"sh osrm.sh \"{locations_order}\"")
