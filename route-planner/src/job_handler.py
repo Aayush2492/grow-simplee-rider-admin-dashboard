@@ -25,7 +25,6 @@ inp_df = pd.read_csv(PATH_TO_DATA_FILE)
 
 NUM_JOBS = inp_df.shape[0]
 NUM_VEHICLES = NUM_JOBS // 20
-NUM_VEHICLE_TYPE = [NUM_JOBS // 2, NUM_JOBS // 2]
 MAX_VOLUME = [20 * 16 * 16, 20 * 12 * 12]  # 100 * 80 * 80, 100 * 60 * 60
 MAX_OBJECT_SIZE = 8 * 8 * 4  # 40 * 40 * 20
 SPEED_MS = 6.5  # 6.5 m/s = 23.25 km/h
@@ -68,7 +67,7 @@ for i in range(NUM_VEHICLES):
         "start": start_coord,
         "end": start_coord,
         "max_travel_time": MAX_TRAVEL_TIME_SEC,
-        "capacity": [MAX_VOLUME[i % 2] - MAX_OBJECT_SIZE - 2*MAX_OBJECT_SIZE],
+        "capacity": [MAX_VOLUME[i % 2] - MAX_OBJECT_SIZE - MAX_OBJECT_SIZE],
     }
     inp["vehicles"].append(x)
 

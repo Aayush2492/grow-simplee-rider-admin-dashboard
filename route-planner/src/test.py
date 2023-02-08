@@ -1,15 +1,12 @@
-import numpy as np
-import pandas as pd
-import json
+a, b, c = 8, 8, 4
 
-with open("jsons/initial_routes.json", "r") as f:
-    initial_routes = json.load(f)
+ans = 0
 
-df = pd.read_csv("data/info_lat_long.csv")
+for i in [1, 2, 4, 8]:
+    for j in [1, 2, 4, 8]:
+        for k in [1, 2, 4]:
+            if i >= j >= k:
+                ans += i * j * k
 
-for vehicle_id in initial_routes:
-    print(vehicle_id, initial_routes[vehicle_id])
-
-for row in df.iterrows():
-    print(row[0] + 1, (row[1]['lat'], row[1]['long']))
-
+print(ans)
+print(8 * 8 * 4)
