@@ -48,5 +48,5 @@ print(np_arr)
 #
 # df.to_csv("big_sample/all_points.csv", index=False)
 # df[:2001].to_csv("big_sample/deliveries.csv", index=False)
-# df[2001:2501].to_csv("big_sample/returns.csv", index=False)
-# df[2501:].to_csv("big_sample/returns.csv", index=False)
+# df[2001:2501].to_csv("big_sample/pickups.csv", index=False)
+# df[2501:].to_csv("big_sample/pickups.csv", index=False)

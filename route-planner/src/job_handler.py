@@ -66,7 +66,7 @@ for i in range(NUM_VEHICLES):
         # "end_index": 0,
         "start": start_coord,
         "end": start_coord,
-        "max_travel_time": MAX_TRAVEL_TIME_SEC,
+        "MAX_TRAVEL_TIME": MAX_TRAVEL_TIME_SEC,
         "capacity": [MAX_VOLUME[i % 2] - MAX_OBJECT_SIZE - MAX_OBJECT_SIZE],
     }
     inp["vehicles"].append(x)
