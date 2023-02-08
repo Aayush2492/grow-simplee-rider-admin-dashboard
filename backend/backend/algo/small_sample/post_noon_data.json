@@ -1,0 +1,130 @@
+{
+  "start_time": "2023-02-08 23:27:04.507707",
+  "routes": {
+    "2": [
+      {
+        "type": "start",
+        "arrival": 0
+      },
+      {
+        "type": "job",
+        "arrival": 606,
+        "id": 5014
+      },
+      {
+        "type": "job",
+        "arrival": 676,
+        "id": 5004
+      },
+      {
+        "type": "job",
+        "arrival": 730,
+        "id": 5009
+      },
+      {
+        "type": "job",
+        "arrival": 908,
+        "id": 5012
+      },
+      {
+        "type": "end",
+        "arrival": 1620
+      }
+    ],
+    "4": [
+      {
+        "type": "start",
+        "arrival": 0
+      },
+      {
+        "type": "job",
+        "arrival": 606,
+        "id": 5010
+      },
+      {
+        "type": "job",
+        "arrival": 1657,
+        "id": 5019
+      },
+      {
+        "type": "job",
+        "arrival": 1853,
+        "id": 5020
+      },
+      {
+        "type": "job",
+        "arrival": 2255,
+        "id": 5002
+      },
+      {
+        "type": "job",
+        "arrival": 3315,
+        "id": 5005
+      },
+      {
+        "type": "job",
+        "arrival": 3465,
+        "id": 5006
+      },
+      {
+        "type": "job",
+        "arrival": 3833,
+        "id": 5007
+      },
+      {
+        "type": "job",
+        "arrival": 3886,
+        "id": 5017
+      },
+      {
+        "type": "job",
+        "arrival": 3906,
+        "id": 5003
+      },
+      {
+        "type": "job",
+        "arrival": 3951,
+        "id": 5018
+      },
+      {
+        "type": "job",
+        "arrival": 4745,
+        "id": 5015
+      },
+      {
+        "type": "job",
+        "arrival": 5148,
+        "id": 5001
+      },
+      {
+        "type": "job",
+        "arrival": 5405,
+        "id": 5016
+      },
+      {
+        "type": "job",
+        "arrival": 5840,
+        "id": 5013
+      },
+      {
+        "type": "job",
+        "arrival": 6182,
+        "id": 5000
+      },
+      {
+        "type": "job",
+        "arrival": 6182,
+        "id": 5008
+      },
+      {
+        "type": "job",
+        "arrival": 6978,
+        "id": 5011
+      },
+      {
+        "type": "end",
+        "arrival": 7570
+      }
+    ]
+  }
+}
