@@ -1,11 +1,41 @@
 import { Button, TextInput, Center, Textarea, Flex, Autocomplete } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
-import Search from '../Search';
-import { useContext, useState } from 'react';
+// import Search from '../Search';
+import { useContext, useEffect, useState, useRef } from 'react';
 import { PositionContext } from '../../context';
 
 export default function AddNewDeliveryDrawer({ isDelivery }) {
+  const [locations, setLocations] = useState([]);
+  const autocompleteRef = useRef(null);
+
+  useEffect(() => {
+    const fetchAllLocations = async () => {
+      try {
+        const res = await fetch(BASE_URL + '/locations');
+        if (!res.ok) {
+          throw new Error('Error fetching all locations');
+        }
+        const data = await res.json();
+
+        // console.log('Data', data);
+        const locations = data.map((location) => {
+          return {
+            id: location.loc_id,
+            lat: location.latitude,
+            lon: location.longitude,
+            value: location.address,
+          };
+        });
+        // console.log('Locs', locations);
+        setLocations(locations);
+      } catch (err) {
+        console.log('Error fetching all locations', err);
+      }
+    };
+    fetchAllLocations();
+  }, []);
+
   const form = useForm({
     initialValues: {
       // weight: '',
@@ -153,7 +183,13 @@ export default function AddNewDeliveryDrawer({ isDelivery }) {
         {/* <TextInput mt="sm" label="Location" placeholder="Location" /> */}
         <br />
         {/* <Search selectPosition={} setSelectPosition={} /> */}
-        <Search selectPosition={selectPosition} setSelectPosition={setSelectPosition} />
+        {/* <Search selectPosition={selectPosition} setSelectPosition={setSelectPosition} /> */}
+        <Autocomplete
+          label="Location"
+          placeholder="Type address here"
+          data={locations}
+          ref={autocompleteRef}
+        />
         <br />
         <Textarea
           placeholder="Your comment"

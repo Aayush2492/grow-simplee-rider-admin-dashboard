@@ -1,11 +1,10 @@
-import React, { useState, useContext } from 'react';
+import React from 'react';
 import { MapComponent } from '../components/MapComponent';
 import { Container, Flex, Drawer } from '@mantine/core';
 import AdminNavbar from '../components/Admin/AdminNavbar';
 import PositionProvider from '../components/context';
-import { PositionContext } from '../components/context';
+
 function Admin() {
-  const { selectPosition, setSelectPosition } = useContext(PositionContext);
   // console.log(selectPosition);
   return (
     <PositionProvider>
