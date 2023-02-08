@@ -9,8 +9,8 @@ PATH_TO_FOLDER = "small_sample"
 PATH_TO_DELIVERY_DATA = f"{PATH_TO_FOLDER}/deliveries.csv"
 PATH_TO_PICKUP_DATA = f"{PATH_TO_FOLDER}/pickups.csv"
 
-PATH_TO_INPUT_FILE = f"{PATH_TO_FOLDER}/temp/inp.json"
-PATH_TO_OUTPUT_FILE = f"{PATH_TO_FOLDER}/temp/out.json"
+PATH_TO_INPUT_FILE = f"{PATH_TO_FOLDER}/temp/noon_inp.json"
+PATH_TO_OUTPUT_FILE = f"{PATH_TO_FOLDER}/temp/noon_out.json"
 PATH_TO_POST_MORN_DATA = f"{PATH_TO_FOLDER}/post_morn_data.json"
 PATH_TO_POST_NOON_DATA = f"{PATH_TO_FOLDER}/post_noon_data.json"
 
@@ -30,7 +30,7 @@ with open(PATH_TO_POST_MORN_DATA, "r") as f:
     edd_format = d["edd_format"]
 
 start_time = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S.%f")
-cur_time = datetime.now()
+cur_time = start_time + timedelta(hours=2)
 time_diff = cur_time - start_time
 end_time = start_time + timedelta(hours=5)
 
@@ -57,10 +57,10 @@ def update_assigned_vehicle_and_add_to_jobs(_route, _vehicle_id):
                 package_info[_id]["assigned_vehicle"] = _vehicle_id
                 inp["jobs"].append({
                     "id": _step["id"],
-                    "location": [float(del_df["lon"][_step["id"]]), float(del_df["lat"][_step["id"]])],
-                    "delivery": [int(del_df["volume"][_step["id"]] / 125)],
+                    "location": package_info[_id]["location"],
+                    "delivery": [package_info[_id]["volume"]],
                     "skills": [int(_vehicle_id)],  # This HAS to be done by this vehicle
-                    "priority": 1000,  # This HAS to be done
+                    "priority": 100,  # This HAS to be done
                 })
             elif package_info[_id]["type"] == "pickup":
                 # This is an undone pickup and hence can be procrastinated
@@ -77,15 +77,28 @@ def update_assigned_vehicle_and_add_to_jobs(_route, _vehicle_id):
     return _steps
 
 
+pickup_ids = list()
+
+for index, row in pic_df.iterrows():
+    pickup_id = int(row[0])
+    pickup_ids.append(pickup_id)
+    if pickup_id not in package_info:
+        package_info[str(pickup_id)] = {
+            "type": "pickup",
+            "assigned_vehicle": -1,
+            "done": False,
+            "location": [float(pic_df["lon"][index]), float(pic_df["lat"][index])],
+            "volume": int(pic_df["volume"][index]) // 125
+        }
+
 # Cluster Here and give a list of indexes of jobs
 # For now, we just assume that all jobs are in one cluster
 pickup_clusters = {
     "1": {
         "vehicles": [str(i) for i in range(1, number_vehicles + 1)],
-        "pickups": [str(i) for i in range(1, number_pickups + 1)]
+        "pickups": pickup_ids
     }
 }
-
 
 for cluster_no, cluster in pickup_clusters.items():
     # Create sample_input
@@ -97,17 +110,10 @@ for cluster_no, cluster in pickup_clusters.items():
     for pickup_id in cluster["pickups"]:
         if pickup_id in package_info and package_info[str(pickup_id)]["done"]:  # Already delivered
             continue
-        elif pickup_id not in package_info:
-            package_info[str(pickup_id)] = {
-                "type": "pickup",
-                "assigned_vehicle": -1,
-                "done": False,
-                "location": [float(del_df["lon"][int(pickup_id)]), float(del_df["lat"][int(pickup_id)])]
-            }
         inp["jobs"].append({
             "id": int(pickup_id),
             "location": package_info[str(pickup_id)]["location"],
-            "pickup": [int(pic_df["volume"][int(pickup_id)] / 125)],
+            "pickup": [package_info[str(pickup_id)]["volume"]],
             "priority": 3,
         })
 
@@ -149,7 +155,6 @@ for cluster_no, cluster in pickup_clusters.items():
             if step["type"] == "job":
                 package_info[str(step["id"])]["assigned_vehicle"] = vehicle_id
                 new_routes[vehicle_id][-1]["id"] = step["id"]
-
 
 with open(PATH_TO_POST_NOON_DATA, "w") as f:
     d = dict()

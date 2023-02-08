@@ -9,8 +9,8 @@ PATH_TO_FOLDER = "small_sample"
 PATH_TO_DELIVERY_DATA = f"{PATH_TO_FOLDER}/deliveries.csv"
 PATH_TO_PICKUP_DATA = f"{PATH_TO_FOLDER}/pickups.csv"
 
-PATH_TO_INPUT_FILE = f"{PATH_TO_FOLDER}/temp/inp.json"
-PATH_TO_OUTPUT_FILE = f"{PATH_TO_FOLDER}/temp/out.json"
+PATH_TO_INPUT_FILE = f"{PATH_TO_FOLDER}/temp/morn_inp.json"
+PATH_TO_OUTPUT_FILE = f"{PATH_TO_FOLDER}/temp/morn_out.json"
 PATH_TO_POST_MORN_DATA = f"{PATH_TO_FOLDER}/post_morn_data.json"
 
 MAX_VOLUME = [20 * 16 * 16, 20 * 12 * 12]    # 100 * 80 * 80, 100 * 60 * 60
@@ -34,20 +34,35 @@ edd_format = "%d-%m-%Y"
 routes = dict()
 
 
+# -1 for unassigned
+# -2 for delivered
+# i if assigned to vehicle i
+package_info = dict()
+delivery_ids = list()
+
+for idx, row in del_df.iterrows():
+    if idx == 0:
+        continue
+    delivery_id = str(idx)
+    delivery_ids.append(delivery_id)
+    package_info[delivery_id] = {
+        "type": "delivery",
+        "done": False,
+        "assigned_vehicle": -1,
+        "location": [float(del_df["lon"][idx]), float(del_df["lat"][idx])],
+        "volume": int(del_df["volume"][idx]) // 125,
+        "edd": del_df["edd"][idx],
+    }
+
+
 # Cluster Here and give a list of indexes of jobs
 # For now, we just assume that all jobs are in one cluster
 delivery_clusters = {
     "1": {
         "vehicles": [str(i) for i in range(1, number_vehicles + 1)],
-        "deliveries": [str(i) for i in range(1, number_deliveries + 1)]
+        "deliveries": delivery_ids
     }
 }
-
-
-# -1 for unassigned
-# -2 for delivered
-# i if assigned to vehicle i
-package_info = dict()
 
 for cluster_no, cluster in delivery_clusters.items():
     # Create sample_input
@@ -67,19 +82,11 @@ for cluster_no, cluster in delivery_clusters.items():
 
     # Create jobs
     for delivery_id in cluster["deliveries"]:
-        edd = datetime.strptime(del_df["edd"][int(delivery_id)], edd_format).date()
-
-        package_info[delivery_id] = {
-            "type": "delivery",
-            "done": False,
-            "assigned_vehicle": -1,
-            "location": [float(del_df["lon"][int(delivery_id)]), float(del_df["lat"][int(delivery_id)])]
-        }
-
+        edd = datetime.strptime(package_info[delivery_id]["edd"], edd_format).date()
         inp["jobs"].append({
             "id": int(delivery_id),
             "location": package_info[delivery_id]["location"],
-            "delivery": [int(del_df["volume"][int(delivery_id)] / 125)],
+            "delivery": [package_info[delivery_id]["volume"]],
             "priority": 15 if edd < today else 30 if edd == today else max(2, 10 - (edd - today).days),
         })
 
