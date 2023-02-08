@@ -234,7 +234,8 @@ def deliver_item(rider_id: int, object_id: int):
         trip_result = queries.check_trip(conn, rider_id=rider_id)
         trip_id = trip_result["tour_id"]
         count = queries.upcoming_deliveries(conn, tour_id=trip_id, object_id=object_id)
-        if count == 0:
+        
+        if count[0]["count"] == 0:
             res = queries.complete_trip(conn, rider_id=rider_id)
         conn.commit()
     except Exception as err:
