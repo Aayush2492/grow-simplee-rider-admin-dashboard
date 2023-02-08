@@ -17,18 +17,18 @@ MAX_VOLUME = [20 * 16 * 16, 20 * 12 * 12]    # 100 * 80 * 80, 100 * 60 * 60
 MAX_OBJECT_SIZE = 8 * 8 * 4                  # 40 * 40 * 20
 MAX_TRAVEL_TIME = 5 * 60 * 60                # 5 hours
 
-inp_df = pd.read_csv(PATH_TO_DELIVERY_DATA)
+del_df = pd.read_csv(PATH_TO_DELIVERY_DATA)
 pic_df = pd.read_csv(PATH_TO_PICKUP_DATA)
 today = datetime.today().date()
 
 start_time = datetime.now()
 end_time = datetime.now() + timedelta(hours=5)
 
-number_deliberies = 150
+number_deliveries = 150
 # number_deliveries = del_df.shape[0] - 1
-number_vehicles = number_deliberies // 22
+number_vehicles = number_deliveries // 22
 # speed_factor = 6.5 # 6.5 m/s = 23.25 km/h
-hub_coord = inp_df["lon"][0], inp_df["lat"][0]
+hub_coord = del_df["lon"][0], del_df["lat"][0]
 
 routes = dict()
 
@@ -36,7 +36,7 @@ routes = dict()
 # Cluster Here and give a list of indexes of jobs
 # For now, we just assume that all jobs are in one cluster
 delivery_clusters = [{"vehicles": [i for i in range(1, number_vehicles + 1)],
-                      "deliveries": [i for i in range(1, number_deliberies + 1)]}]
+                      "deliveries": [i for i in range(1, number_deliveries + 1)]}]
 
 # -1 for unassigned
 # -2 for delivered
@@ -61,11 +61,11 @@ for cluster in delivery_clusters:
 
     # Create jobs
     for i in cluster["deliveries"]:
-        edd = datetime.strptime(inp_df["edd"][i], "%Y-%m-%d").date()
+        edd = datetime.strptime(del_df["edd"][i], "%Y-%m-%d").date()
         inp["jobs"].append({
             "id": i,
-            "location": [float(inp_df["lon"][i]), float(inp_df["lat"][i])],
-            "delivery": [int(inp_df["volume"][i] / 125)],
+            "location": [float(del_df["lon"][i]), float(del_df["lat"][i])],
+            "delivery": [int(del_df["volume"][i] / 125)],
             "priority": 15 if edd < today else 30 if edd == today else max(2, 10 - (edd - today).days),
         })
 
