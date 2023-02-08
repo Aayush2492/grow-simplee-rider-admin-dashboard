@@ -1,9 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { Container, Flex } from '@mantine/core';
 import RiderNavbar from '../../components/RiderNavbar';
 import { MapComponent } from '../../components/MapComponent';
 import { useRouter } from 'next/router';
-import { useContext } from 'react';
 import { RiderContext } from '../../components/context/RiderContext';
 
 export default function RiderPage() {
