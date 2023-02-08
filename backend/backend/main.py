@@ -224,13 +224,18 @@ def accept_trip(rider_id: int):
     return {"status": results}
 
 
-@app.post("/rider/{rider_id}/deliver")
+@app.post("/rider/{rider_id}/deliver/{object_id}")
 def deliver_item(rider_id: int, object_id: int):
     """
     Marks Object ID as delivered.
     """
     try:
         results = queries.mark_delivered(conn, obj_id=object_id)
+        trip_result = queries.check_trip(conn, rider_id=rider_id)
+        trip_id = trip_result["tour_id"]
+        count = queries.upcoming_deliveries(conn, tour_id=trip_id, object_id=object_id)
+        if count == 0:
+            res = queries.complete_trip(conn, rider_id=rider_id)
         conn.commit()
     except Exception as err:
         conn.rollback()

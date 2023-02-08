@@ -38,3 +38,9 @@ UPDATE tour SET tour_status = 1 WHERE assigned_rider = :rider_id AND tour_status
 
 -- name: mark_delivered!
 UPDATE package SET completed = true AND delivered_time = CURRENT_TIMESTAMP WHERE object_id = :obj_id;
+
+-- name: upcoming_deliveries$
+SELECT COUNT(*) FROM delivery WHERE id = :tour_id AND delivery_order > (SELECT delivery_order FROM delivery WHERE item = :object_id);
+
+-- name: complete_trip!
+UPDATE tour SET tour_status = 2 WHERE assigned_rider = :rider_id AND tour_status = 1;
