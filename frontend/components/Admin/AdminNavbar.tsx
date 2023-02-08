@@ -17,6 +17,7 @@ import {
   IconTruckReturn,
   IconBike,
   IconUser,
+  IconAddressBook,
 } from '@tabler/icons';
 import AddNewDeliveryDrawer from './Drawers/AddNewDeliveryDrawer';
 import styles from '../../css/Box.module.css';
@@ -25,6 +26,7 @@ import RidersDrawer from './Drawers/RidersDrawer';
 import PackagesDrawer from './Drawers/PackagesDrawer';
 import ProfileDrawer from './Drawers/ProfileDrawer';
 import { ColorSchemeToggle } from '../ColorSchemeToggle/ColorSchemeToggle';
+import AddressDrawer from './Drawers/AddressDrawer';
 
 const useStyles = createStyles((theme) => ({
   link: {
@@ -73,6 +75,7 @@ const mockdata = [
   { icon: IconBike, label: 'Drivers', title: 'Riders' },
   { icon: IconPackage, label: 'Packages', title: 'Packages' },
   { icon: IconUser, label: 'Profile', title: 'Profile' },
+  { icon: IconAddressBook, label: 'Add Adress', title: 'Add Address' },
 ];
 
 export default function AdminNavbar({ children }) {
@@ -119,6 +122,7 @@ export default function AdminNavbar({ children }) {
               {active === 2 && <RidersDrawer />}
               {active === 3 && <PackagesDrawer />}
               {active === 4 && <ProfileDrawer />}
+              {active === 5 && <AddressDrawer />}
             </div>
           </Drawer>
         </>

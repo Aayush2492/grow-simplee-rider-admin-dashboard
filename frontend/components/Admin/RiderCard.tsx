@@ -43,7 +43,11 @@ export default function RiderCard(item: Rider) {
           setSelectPosition({ lat: item.latitude, lon: item.longitude, placename: '' })
         }
       >
-        Show on map
+        Show current position
+      </Button>
+
+      <Button variant="light" color="green" fullWidth mt="md" radius="md">
+        Show route
       </Button>
     </Card>
   );

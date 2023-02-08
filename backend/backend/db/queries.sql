@@ -38,3 +38,6 @@ UPDATE tour SET tour_status = 1 WHERE assigned_rider = :rider_id AND tour_status
 
 -- name: mark_delivered!
 UPDATE package SET completed = true AND delivered_time = CURRENT_TIMESTAMP WHERE object_id = :obj_id;
+
+-- name: add_address!
+INSERT INTO addresses (address) VALUES (:address);
