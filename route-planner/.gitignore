@@ -2,3 +2,10 @@ venv
 .venv
 poetry.lock
 .env
+
+# Pycache
+__pycache__/
+*.py[cod]
+
+# These files are to be extracted
+*.osrm*

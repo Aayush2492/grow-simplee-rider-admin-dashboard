@@ -1,0 +1,20 @@
+version: '3'
+services:
+  osrm:
+    image: osrm/osrm-backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ${PWD}/data_karnataka:/data
+    command: [
+      "osrm-routed",
+      "/data/karnataka-latest.osrm"
+      "--algorithm mld",
+      "--max-viaroute-size 15000",
+      "--max-trip-size 3000",
+      "--max-table-size 3000",
+      "--max-matching-size 3000",
+      "--max-nearest-size 3000",
+      "--max-alternatives 10",
+      "--max-matching-radius -1"
+    ]

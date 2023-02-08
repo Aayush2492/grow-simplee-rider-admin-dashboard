@@ -15,3 +15,10 @@
    ```
    poetry install
    ```
+
+## Running OSRM as backend
+
+[This](https://download.openstreetmap.fr/extracts/asia/india/) site has the latest
+OSRM extracts for India. Download the Karnataka extract and extract it to the
+`data` folder ideally but this is very slow.
+

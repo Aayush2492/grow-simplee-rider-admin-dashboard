@@ -7,11 +7,11 @@ import time
 from dotenv import load_dotenv
 load_dotenv()
 
-# def get_place_ids(data):
+# def get_place_ids(df):
 
-#   f = open("data/drop_points_place_ids.txt", "w")
-#   temp = data['addresses']
-#   data['addresses'] = []
+#   f = open("df/drop_points_place_ids.txt", "w")
+#   temp = df['addresses']
+#   df['addresses'] = []
 #   for index, address in enumerate(temp):
 #     print(index + 1)
 #     try:
@@ -27,7 +27,7 @@ load_dotenv()
 #     payload={}
 #     headers = {}
 
-#     response = requests.request("GET", url, headers=headers, data=payload)
+#     response = requests.request("GET", url, headers=headers, df=payload)
 #     response = json.loads(response.text)
 
 #     if response['status'] != 'OK':
@@ -41,16 +41,16 @@ load_dotenv()
 #     if len(response['results']) > 1:
 #         print(f"More than one place ID found for {address} ")
 
-#     data['addresses'].append(response['results'][0]['place_id'])
+#     df['addresses'].append(response['results'][0]['place_id'])
 #     f.write(response['results'][0]['place_id'] + "\n")
   
 #   f.close()
 
 def create_data():
-  """Creates the data."""
+  """Creates the df."""
   data = {}
   data['API_key'] = os.getenv('GOOGLE_MAPS_API_KEY')
-  # print(data['API_key'])
+  # print(df['API_key'])
   data['addresses'] = [] # Stores the place ids
 
   with open("data/drop_points_place_ids.txt", 'r') as f:
@@ -65,8 +65,8 @@ def create_data():
       if len(data['addresses']) >= 218:
         break
 
-  # get_place_ids(data)
-  # print("print", data['addresses'])
+  # get_place_ids(df)
+  # print("print", df['addresses'])
   print("Number of addresses:", len(data['addresses']))
   return data
 
@@ -149,7 +149,7 @@ def build_distance_matrix(response):
 
 def create():
   """Entry point of the program"""
-  # Create the data.
+  # Create the df.
   data = create_data()
 
   start = time.time()
