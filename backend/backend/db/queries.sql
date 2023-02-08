@@ -31,13 +31,23 @@ SELECT * FROM rider;
 UPDATE rider SET latitude = :latitude AND longitude = :longitude WHERE rider_id = :rider_id;
 
 -- name: check_trip^
-SELECT tour_status FROM tour WHERE assigned_rider = :rider_id AND tour_status != 2;
+SELECT tour_id, tour_status FROM tour WHERE assigned_rider = :rider_id AND tour_status != 2;
 
 -- name: accept_trip!
 UPDATE tour SET tour_status = 1 WHERE assigned_rider = :rider_id AND tour_status = 0;
 
 -- name: mark_delivered!
+<<<<<<< HEAD
 UPDATE package SET completed = true AND delivered_time = CURRENT_TIMESTAMP WHERE object_id = :obj_id;
 
 -- name: add_address!
 INSERT INTO addresses (address) VALUES (:address);
+=======
+UPDATE package SET completed = true, delivered_time = CURRENT_TIMESTAMP WHERE object_id = :obj_id;
+
+-- name: upcoming_deliveries
+SELECT COUNT(*) FROM delivery WHERE id = :tour_id AND delivery_order > (SELECT delivery_order FROM delivery WHERE item = :object_id);
+
+-- name: complete_trip!
+UPDATE tour SET tour_status = 2 WHERE assigned_rider = :rider_id AND tour_status = 1;
+>>>>>>> fd2060deb853c84823272c1234c030945f8dc707

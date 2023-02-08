@@ -213,15 +213,22 @@ def viewroute(rider_id: int):
     try:
         result = queries.check_trip(conn, rider_id=rider_id)
         if result['tour_status'] != None:
-            return {"status": 1 - result['tour_status']}
+            with open("geo_jsons/{}_geo.json".format(result["tour_id"])) as f:
+                geo_json = json.load(f)
+            return {
+                    "status": result['tour_status'],
+                    "geo-json": geo_json
+                    }
 
         if result is None:
-            raise HTTPException(
-                status_code=404, detail='Trip not assigned or active')
+            return {"status": -1}
+            # raise HTTPException(
+            #     status_code=404, detail='Trip not assigned or active')
 
     except Exception as err:
         conn.rollback()
-        raise HTTPException(status_code=500, detail=str(err))
+        # raise HTTPException(status_code=500, detail=str(err))
+        return {"status": -1}
 
 
 @app.post("/rider/{rider_id}/accept")
@@ -235,13 +242,19 @@ def accept_trip(rider_id: int):
     return {"status": results}
 
 
-@app.post("/rider/{rider_id}/deliver")
+@app.post("/rider/{rider_id}/deliver/{object_id}")
 def deliver_item(rider_id: int, object_id: int):
     """
     Marks Object ID as delivered.
     """
     try:
         results = queries.mark_delivered(conn, obj_id=object_id)
+        trip_result = queries.check_trip(conn, rider_id=rider_id)
+        trip_id = trip_result["tour_id"]
+        count = queries.upcoming_deliveries(conn, tour_id=trip_id, object_id=object_id)
+        
+        if count[0]["count"] == 0:
+            res = queries.complete_trip(conn, rider_id=rider_id)
         conn.commit()
     except Exception as err:
         conn.rollback()

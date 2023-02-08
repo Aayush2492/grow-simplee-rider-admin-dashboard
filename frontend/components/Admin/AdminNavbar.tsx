@@ -115,6 +115,7 @@ export default function AdminNavbar({ children }) {
             size="xl"
             className={styles.insidediv}
             style={{ translate: '5%' }}
+            overlayOpacity={0}
           >
             <div style={{ paddingLeft: 40 }}>
               {active === 0 && <AddNewDeliveryDrawer isDelivery={true} />}
