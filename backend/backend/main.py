@@ -280,11 +280,12 @@ def solve_routes():
 
 @app.get("/submission")
 def solve_submission():
-    with open("../../route-planner/src/small_sample/post_morn_data.json") as f:
+    with open("../../route-planner/src/small_sample/post_noon_data.json") as f:
         contents = json.load(f)
         routes = contents["routes"]
         for rider in routes.keys():
             route = routes[rider]
+            rider = "1" + rider
             locations_order = "77.5946,12.9716;"
             locations = [[77.5946, 12.9716]]
             for job in route:

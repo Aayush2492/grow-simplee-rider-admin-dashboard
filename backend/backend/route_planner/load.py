@@ -40,5 +40,5 @@ def solve_routes(out_file='output.json'):
 
     return  vehicles, output
 
-vehicles, output = solve_routes()
-print(vehicles, output)
+# vehicles, output = solve_routes()
+# print(vehicles, output)
