@@ -4,6 +4,7 @@ import RiderNavbar from '../../components/RiderNavbar';
 import { MapComponent } from '../../components/MapComponent';
 import { useRouter } from 'next/router';
 import { RiderContext } from '../../components/context/RiderContext';
+import GeojsonProvider from '../../components/context/GeojsonContext';
 
 export default function RiderPage() {
   const router = useRouter();
@@ -63,7 +64,7 @@ export default function RiderPage() {
   }, []);
 
   return (
-    <>
+    <GeojsonProvider>
       <RiderNavbar>
         <div style={{ width: '100vw', height: '100vh', position: 'fixed' }}>
           <Flex justify="flex-start" align="flex-start" direction="row">
@@ -73,6 +74,6 @@ export default function RiderPage() {
           </Flex>
         </div>
       </RiderNavbar>
-    </>
+    </GeojsonProvider>
   );
 }

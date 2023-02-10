@@ -77,6 +77,7 @@ async def add_locations(locations: List[Location]):
         raise HTTPException(status_code=500, detail="Some Error Occured")
     return {'ids': ids}
 
+
 @app.get('/locations')
 def get_all_packages():
     """
@@ -88,6 +89,7 @@ def get_all_packages():
         conn.rollback()
         raise HTTPException(status_code=500, detail=str(err))
     return results
+
 
 @app.get("/packages", response_model=List[PackageOut])
 def get_all_packages():
@@ -157,12 +159,14 @@ def addaddress(address: Addresses):
     """
     # print(addr)
     try:
-        g = geocoder.bing(address, key='Ag3_-x9aIPCQxhENQQcDUeFWirDR4tvRr1YUArJF9nrvnUnBv2wis5jue73E_Nxe')
+        g = geocoder.bing(
+            address, key='Ag3_-x9aIPCQxhENQQcDUeFWirDR4tvRr1YUArJF9nrvnUnBv2wis5jue73E_Nxe')
         results = g.json
         if results:
             lat = results['lat']
             lng = results['lng']
-            results = queries.insert_location(conn, latitude=lat, longitude=lng, address=address)
+            results = queries.insert_location(
+                conn, latitude=lat, longitude=lng, address=address)
         conn.commit()
     except Exception as err:
         conn.rollback()
@@ -173,12 +177,12 @@ def addaddress(address: Addresses):
 
 @app.get('/solve_routes')
 def solve_routes():
-    # First retrieve objects from DB 
-    # Add Hub Location !! imp 
-    results =  queries.get_undelivered_packages(conn)
+    # First retrieve objects from DB
+    # Add Hub Location !! imp
+    results = queries.get_undelivered_packages(conn)
 
-    bounding_boxes = [(5,5,5),(10,5,5), (10,10,5), (10,10,10), (20,10,10), (20,20,10), (20,20,20), 
-    (40, 20, 20), (40, 40, 20), (40, 40, 20), (40, 40, 40), (80, 40, 40), (80, 80, 40)]
+    bounding_boxes = [(5, 5, 5), (10, 5, 5), (10, 10, 5), (10, 10, 10), (20, 10, 10), (20, 20, 10), (20, 20, 20),
+                      (40, 20, 20), (40, 40, 20), (40, 40, 20), (40, 40, 40), (80, 40, 40), (80, 80, 40)]
     input_frame = []
     object_map = {}
     for idx, obj in enumerate(results):
@@ -186,7 +190,8 @@ def solve_routes():
         row['lat'] = obj['longitude']
         row['lon'] = obj['longitude']
         row['id'] = obj['object_id']
-        delivery_time = datetime.fromtimestamp(obj['delivery_date']).strftime('%y-%m-%d')
+        delivery_time = datetime.fromtimestamp(
+            obj['delivery_date']).strftime('%y-%m-%d')
         row['edd'] = delivery_time
         l = float(obj['length'])
         b = float(obj['height'])
@@ -194,19 +199,19 @@ def solve_routes():
         dims = [l, b, h]
         dims.sort()
         max_dim = dims[2]
-        alias_dims = [20,40,40]
+        alias_dims = [20, 40, 40]
         for each in bounding_boxes:
-            if each[0] >=  max_dims:
+            if each[0] >= max_dims:
                 alias_dims[0] = each[0]
                 break
         next_dim = dims[1]
         for each in bounding_boxes:
-            if each[0] ==  max_dims and each[1] >= next_dim:
+            if each[0] == max_dims and each[1] >= next_dim:
                 alias_dims[1] = each[1]
                 break
         last_dim = dims[0]
         for each in bounding_boxes:
-            if each[1] ==  max_dims and each[1] == next_dim and each[2] >= last_dim:
+            if each[1] == max_dims and each[1] == next_dim and each[2] >= last_dim:
                 alias_dims[2] = each[2]
                 break
         vol = last_dim[0]*last_dim[1]*last_dim[2]
@@ -215,7 +220,7 @@ def solve_routes():
         input_frame.append(row)
         object_map[idx] = obj['object_id']
 
-    # rider_map 
+    # rider_map
     rider_res = queries.get_riders(conn)
     bags_res = queries.get_bags(conn)
 
@@ -226,13 +231,15 @@ def solve_routes():
     for i in range(min_len):
         print(i)
         # True is for the bigger bag
-        # 
+        #
         if bags_res[i]['bag_type'] is True:
             vehicle_indices.append(i*2)
-            rider_bag_map[i*2] = (bags_res[i]['bag_id'], rider_res[i]['rider_id'])
+            rider_bag_map[i*2] = (bags_res[i]['bag_id'],
+                                  rider_res[i]['rider_id'])
         else:
             vehicle_indices.append(2*i + 1)
-            rider_bag_map[i*2 + 1] = (bags_res[i]['bag_id'], rider_res[i]['rider_id'])
+            rider_bag_map[i*2 + 1] = (bags_res[i]
+                                      ['bag_id'], rider_res[i]['rider_id'])
     # now give as input vehicle_indices, and input_frame
 
     keys = input_frame[0].keys()
@@ -241,20 +248,21 @@ def solve_routes():
         dict_writer = csv.DictWriter(output_file, keys)
         dict_writer.writeheader()
         dict_writer.writerows(input_frame)
-    # output preprocessing 
+    # output preprocessing
     # call my load function
-    vehicles , outputs = solve_routes()
+    vehicles, outputs = solve_routes()
 
     # insert tours
     trip_rider_map = {}
 
     # TODO: Commit all at once to prevent race
     for each in vehicles.keys():
-        # TODO: replace rider_id with actual rider_id 
+        # TODO: replace rider_id with actual rider_id
         try:
             bag_id = rider_bag_map[each][0]
             rider_id = rider_bag_map[each][1]
-            results = queries.insert_tour(conn, rider_id=rider_id ,bag_id=bag_id, tour_status=0)
+            results = queries.insert_tour(
+                conn, rider_id=rider_id, bag_id=bag_id, tour_status=0)
             conn.commit()
             trip_id = results['id']
             trip_rider_map[each] = (trip_id, rider_id)
@@ -267,66 +275,19 @@ def solve_routes():
         alias = each[0]
         obj_id = each[1]
         try:
-            queries.insert_delivery_item(conn, tour_id=trip_rider_map[each], item=obj_id,delivery_order=each[2])
+            queries.insert_delivery_item(
+                conn, tour_id=trip_rider_map[each], item=obj_id, delivery_order=each[2])
             conn.commit()
         except Exception as err:
             conn.rollback()
             raise HTTPException(status_code=500, detail=str(err))
-    return  {'status':'ok'}
-            
+    return {'status': 'ok'}
+
     # Now solve the routes and get the trip locations
     # trips, trip_indices = solve_routes()
     # Now insert the trips to the DB, and assign the riders accordingly
 
-@app.get("/submission")
-def solve_submission():
-    with open("../../route-planner/src/small_sample/post_noon_data.json") as f:
-        contents = json.load(f)
-        routes = contents["routes"]
-        for rider in routes.keys():
-            route = routes[rider]
-            rider = "1" + rider
-            locations_order = "77.5946,12.9716;"
-            locations = [[77.5946, 12.9716]]
-            for job in route:
-                if job["type"] == "job":
-                    job_id = job["id"]
-                    coordinates = contents["package_info"][f"{job_id}"]["location"]
-                    locations_order += "{},{};".format(coordinates[0], coordinates[1])
-                    locations.append([coordinates[0], coordinates[1]])
-            locations_order += "77.5946,12.9716"
-            locations.append([77.5946, 12.9716])
 
-            with open("geocodes.csv", 'a', encoding="UTF-8") as f:
-                writer = csv.writer(f)
-                writer.writerow([f"{rider:>5}", "       latitude", "      longitude"])
-                for loc in locations:
-                    writer.writerow(["     ", f"{loc[1]:>15}", f"{loc[0]:>15}"])
-            
-            os.system(f"sh osrm.sh \"{locations_order}\"")
-            input_file = open("result.json")
-            result_data = json.load(input_file)
-            with open("geo_jsons/geo_example.json") as f:
-                geo_json = json.load(f)
-
-            geo_json["features"][0]["geometry"] = result_data["routes"][0]["geometry"]
-            for loc in locations:
-                if loc[0] == 77.5946 and loc[1] == 12.9716:
-                    marker = {
-                            "type": "Feature",
-                            "geometry": { "type": "Point", "coordinates": loc },
-                            "properties": { "name": "Point" , "marker-color": "#F00"}
-                    }
-                else:
-                    marker = {
-                            "type": "Feature",
-                            "geometry": { "type": "Point", "coordinates": loc },
-                            "properties": { "name": "Point" }
-                    }
-                geo_json["features"].append(marker)
-            with open(f"geo_jsons/{rider}_geo.json", 'w') as f:
-                json.dump(geo_json, f)
-            
 @app.get("/oldsolveall")
 def solve_all():
     # First compute the distance matrix
@@ -334,8 +295,7 @@ def solve_all():
     # Now solve the routes and get the trip locations
     # trips, trip_indices = solve_routes()
     # Now insert the trips to the DB, and assign the riders accordingly
-    
-    
+
     df = pd.read_csv('../../route-planner/src/data/info_lat_long.csv')
     with open("../../route-planner/src/jsons/initial_routes.json") as f:
         contents = json.load(f)
@@ -360,15 +320,15 @@ def solve_all():
             for loc in locations:
                 if loc[0] == 77.5946 and loc[1] == 12.9716:
                     marker = {
-                            "type": "Feature",
-                            "geometry": { "type": "Point", "coordinates": loc },
-                            "properties": { "name": "Point" , "marker-color": "#F00"}
+                        "type": "Feature",
+                        "geometry": {"type": "Point", "coordinates": loc},
+                        "properties": {"name": "Point", "marker-color": "#F00"}
                     }
                 else:
                     marker = {
-                            "type": "Feature",
-                            "geometry": { "type": "Point", "coordinates": loc },
-                            "properties": { "name": "Point" }
+                        "type": "Feature",
+                        "geometry": {"type": "Point", "coordinates": loc},
+                        "properties": {"name": "Point"}
                     }
                 geo_json["features"].append(marker)
             with open(f"geo_jsons/{rider}_geo.json", 'w') as f:
@@ -382,6 +342,7 @@ def pickup():
     WIP
     """
     return {"status": "ok"}
+
 
 @app.post("/simulate")
 def pickup():
@@ -433,14 +394,14 @@ def viewroute(rider_id: int):
     Else, you get a status 404, indicating that you do not have a current trip
     """
     try:
-        result = queries.check_trip(conn, rider_id=rider_id)
-        if result['tour_status'] != None:
-            with open("geo_jsons/{}_geo.json".format(result["tour_id"])) as f:
-                geo_json = json.load(f)
-            return {
-                    "status": result['tour_status'],
-                    "geo-json": geo_json
-                    }
+        # result = queries.check_trip(conn, rider_id=rider_id)
+        # if result['tour_status'] != None:
+        with open("geo_jsons/{}_geo.json".format(rider_id)) as f:
+            geo_json = json.load(f)
+        return {
+            # "status": result['tour_status'],
+            "geo-json": geo_json
+        }
 
         if result is None:
             return {"status": -1}
@@ -473,8 +434,9 @@ def deliver_item(rider_id: int, object_id: int):
         results = queries.mark_delivered(conn, obj_id=object_id)
         trip_result = queries.check_trip(conn, rider_id=rider_id)
         trip_id = trip_result["tour_id"]
-        count = queries.upcoming_deliveries(conn, tour_id=trip_id, object_id=object_id)
-        
+        count = queries.upcoming_deliveries(
+            conn, tour_id=trip_id, object_id=object_id)
+
         if count[0]["count"] == 0:
             res = queries.complete_trip(conn, rider_id=rider_id)
         conn.commit()
@@ -503,6 +465,7 @@ def update_loc(rider_id: int, latitude: float, longitude: float):
 
     return {"status": results}
 
+
 @app.get("/trip/{object_id}")
 def object_id_trip(object_id: int):
     """
@@ -517,6 +480,7 @@ def object_id_trip(object_id: int):
     if results != None:
         return {"trip": results["id"]}
     return {"trip": -1}
+
 
 @app.get("/rider/trip/{rider_id}")
 def gen_trip_geo_json(rider_id: int):
@@ -542,37 +506,37 @@ def gen_trip_geo_json(rider_id: int):
             writer.writerow([f"{trip_id:>5}", "  latitude", " longitude"])
             for loc in locations:
                 writer.writerow(["     ", f"{loc[1]:>10}", f"{loc[0]:>10}"])
-            
+
         os.system(f"sh osrm.sh \"{locations_order}\"")
         input_file = open("result.json")
         result_data = json.load(input_file)
         with open("geo_jsons/geo_example.json") as f:
             geo_json = json.load(f)
-        
+
         geo_json["features"][0]["geometry"] = result_data["routes"][0]["geometry"]
         for loc in locations:
             if loc[0] == 77.5946 and loc[1] == 12.9716:
                 marker = {
-                            "type": "Feature",
-                            "geometry": { "type": "Point", "coordinates": loc },
-                            "properties": { "name": "Point" , "marker-color": "#F00"}
-                        }
+                    "type": "Feature",
+                            "geometry": {"type": "Point", "coordinates": loc},
+                            "properties": {"name": "Point", "marker-color": "#F00"}
+                }
             else:
                 marker = {
-                            "type": "Feature",
-                            "geometry": { "type": "Point", "coordinates": loc },
-                            "properties": { "name": "Point" }
-                        }
+                    "type": "Feature",
+                            "geometry": {"type": "Point", "coordinates": loc},
+                            "properties": {"name": "Point"}
+                }
             geo_json["features"].append(marker)
             with open(f"geo_jsons/{trip_id}_geo.json", 'w') as f:
                 json.dump(geo_json, f)
-        
 
     except Exception as err:
         conn.rollback()
         raise HTTPException(status_code=500, detail=str(err))
-    
+
     return {"status": "ok"}
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

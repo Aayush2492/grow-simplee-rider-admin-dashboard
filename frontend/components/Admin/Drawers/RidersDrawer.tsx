@@ -38,7 +38,7 @@ export default function RidersDrawer() {
           </>
         );
       })}
-      <>
+      {/* <>
         <RiderCard
           name={'Prachodhan Keerti Das'}
           contact={9986012301}
@@ -59,7 +59,7 @@ export default function RidersDrawer() {
           key={18}
         />
         <br />
-      </>
+      </> */}
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { Container, Flex, Drawer } from '@mantine/core';
 import AdminNavbar from '../components/Admin/AdminNavbar';
 import PositionProvider from '../components/context';
 import { RiderContext } from '../components/context/RiderContext';
+import GeojsonProvider from '../components/context/GeojsonContext';
 
 function Admin() {
   // console.log(selectPosition);
@@ -24,15 +25,17 @@ function Admin() {
 
   return (
     <PositionProvider>
-      <AdminNavbar>
-        <div style={{ width: '100vw', height: '100vh', position: 'fixed' }}>
-          <Flex justify="flex-start" align="flex-start" direction="row">
-            <Container>
-              <MapComponent height={'100vh'} width={'100vw'} />
-            </Container>
-          </Flex>
-        </div>
-      </AdminNavbar>
+      <GeojsonProvider>
+        <AdminNavbar>
+          <div style={{ width: '100vw', height: '100vh', position: 'fixed' }}>
+            <Flex justify="flex-start" align="flex-start" direction="row">
+              <Container>
+                <MapComponent height={'100vh'} width={'100vw'} />
+              </Container>
+            </Flex>
+          </div>
+        </AdminNavbar>
+      </GeojsonProvider>
     </PositionProvider>
   );
 }
