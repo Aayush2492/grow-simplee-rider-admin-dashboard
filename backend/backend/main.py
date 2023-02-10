@@ -235,7 +235,12 @@ def solve_routes():
             rider_bag_map[i*2 + 1] = (bags_res[i]['bag_id'], rider_res[i]['rider_id'])
     # now give as input vehicle_indices, and input_frame
 
-    
+    keys = input_frame[0].keys()
+
+    with open('algo/deliveries.csv', 'w', newline='') as output_file:
+        dict_writer = csv.DictWriter(output_file, keys)
+        dict_writer.writeheader()
+        dict_writer.writerows(input_frame)
     # output preprocessing 
     # call my load function
     vehicles , outputs = solve_routes()
