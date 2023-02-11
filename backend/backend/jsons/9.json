@@ -1,0 +1,1 @@
+{"9": [{"type": "start", "arrival": 0}, {"type": "job", "arrival": 410, "id": 86}, {"type": "job", "arrival": 515, "id": 79}, {"type": "job", "arrival": 718, "id": 122}, {"type": "job", "arrival": 805, "id": 53}, {"type": "job", "arrival": 805, "id": 167}, {"type": "end", "arrival": 1062}]}

@@ -1,0 +1,17 @@
+{
+  "1": [
+    { "type": "start", "arrival": 0 },
+    { "type": "job", "arrival": 21, "id": 44 },
+    { "type": "job", "arrival": 896, "id": 56 },
+    { "type": "job", "arrival": 1415, "id": 72 },
+    { "type": "job", "arrival": 2280, "id": 17 },
+    { "type": "job", "arrival": 2286, "id": 27 },
+    { "type": "job", "arrival": 2346, "id": 98 },
+    { "type": "job", "arrival": 2911, "id": 47 },
+    { "type": "job", "arrival": 2948, "id": 29 },
+    { "type": "job", "arrival": 2980, "id": 89 },
+    { "type": "job", "arrival": 3052, "id": 28 },
+    { "type": "job", "arrival": 3095, "id": 128 },
+    { "type": "end", "arrival": 3310 }
+  ]
+}

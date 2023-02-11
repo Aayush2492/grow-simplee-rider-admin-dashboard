@@ -172,7 +172,7 @@ def addaddress(address: Addresses):
 
 
 @app.get('/solve_routes')
-def solve_routes():
+def solveroutes():
     # First retrieve objects from DB 
     # Add Hub Location !! imp 
     results =  queries.get_undelivered_packages(conn)
@@ -181,13 +181,24 @@ def solve_routes():
     (40, 20, 20), (40, 40, 20), (40, 40, 20), (40, 40, 40), (80, 40, 40), (80, 80, 40)]
     input_frame = []
     object_map = {}
-    for idx, obj in enumerate(results):
+    input_frame.append({'id': 0,
+                        'lon': 77.5942765,
+                        'lat': 12.9719418,
+                        'volume': 125,
+                        'edd': "05-02-2023"})
+    object_map[0] = 0
+
+    pickup_input_frame = []
+    pickup_object_map = {}
+
+    for idx, obj in enumerate(results, 1):
         row = {}
-        row['lat'] = obj['longitude']
-        row['lon'] = obj['longitude']
         row['id'] = obj['object_id']
-        delivery_time = datetime.fromtimestamp(obj['delivery_date']).strftime('%y-%m-%d')
-        row['edd'] = delivery_time
+        row['lon'] = obj['longitude']
+        row['lat'] = obj['latitude']
+        
+        delivery_time = obj['delivery_date'].date().strftime('%d-%m-%Y')
+        
         l = float(obj['length'])
         b = float(obj['height'])
         h = float(obj['breadth'])
@@ -196,96 +207,146 @@ def solve_routes():
         max_dim = dims[2]
         alias_dims = [20,40,40]
         for each in bounding_boxes:
-            if each[0] >=  max_dims:
+            if each[0] >=  max_dim:
                 alias_dims[0] = each[0]
                 break
         next_dim = dims[1]
         for each in bounding_boxes:
-            if each[0] ==  max_dims and each[1] >= next_dim:
+            if each[0] ==  max_dim and each[1] >= next_dim:
                 alias_dims[1] = each[1]
                 break
         last_dim = dims[0]
         for each in bounding_boxes:
-            if each[1] ==  max_dims and each[1] == next_dim and each[2] >= last_dim:
+            if each[1] ==  max_dim and each[1] == next_dim and each[2] >= last_dim:
                 alias_dims[2] = each[2]
                 break
-        vol = last_dim[0]*last_dim[1]*last_dim[2]
+        vol = alias_dims[0] * alias_dims[1] * alias_dims[2]
 
-        row['volume'] = 32000
-        input_frame.append(row)
-        object_map[idx] = obj['object_id']
-
-    # rider_map 
-    rider_res = queries.get_riders(conn)
-    bags_res = queries.get_bags(conn)
-
-    min_len = min(len(rider_res), min(bags_res))
-
-    rider_bag_map = {}
-    vehicle_indices = []
-    for i in range(min_len):
-        print(i)
-        # True is for the bigger bag
-        # 
-        if bags_res[i]['bag_type'] is True:
-            vehicle_indices.append(i*2)
-            rider_bag_map[i*2] = (bags_res[i]['bag_id'], rider_res[i]['rider_id'])
+        row['volume'] = vol
+        if obj['obj_type']:
+            row['edd'] = delivery_time
+            input_frame.append(row)
+            object_map[idx] = obj['object_id']
         else:
-            vehicle_indices.append(2*i + 1)
-            rider_bag_map[i*2 + 1] = (bags_res[i]['bag_id'], rider_res[i]['rider_id'])
-    # now give as input vehicle_indices, and input_frame
-
-    keys = input_frame[0].keys()
+            pickup_input_frame.append(row)
+            pickup_object_map[idx] = obj['object_id']
+    
+    keys = ['id', 'lon', 'lat', 'volume', 'edd']
 
     with open('algo/deliveries.csv', 'w', newline='') as output_file:
         dict_writer = csv.DictWriter(output_file, keys)
         dict_writer.writeheader()
         dict_writer.writerows(input_frame)
+    
+    keys.remove('edd')
+    with open('algo/pickups.csv', 'w', newline='') as output_file:
+        dict_writer = csv.DictWriter(output_file, keys)
+        dict_writer.writeheader()
+        dict_writer.writerows(pickup_input_frame)
+    
+    
+    # rider_map 
+    rider_res = queries.get_riders(conn)
+    bags_res = queries.get_bags(conn)
+
+    min_len = min(len(rider_res), len(bags_res))
+
+    rider_bag_map = {}
+    vehicle_json = []
+    for i in range(min_len):
+        # print(i)
+        # True is for the bigger bag
+        # 
+        if bags_res[i]['bag_type'] is True:
+            vehicle_info = {"id": str(2*i + 1)}
+            rider_bag_map[i*2 + 1] = (bags_res[i]['bag_id'], rider_res[i]['rider_id'])
+        else:
+            vehicle_info = {"id": str(2*i)}
+            rider_bag_map[i*2] = (bags_res[i]['bag_id'], rider_res[i]['rider_id'])
+        try:
+            result = queries.check_trip(conn, rider_id=rider_res[i]['rider_id'])
+            if result is None:
+                vehicle_info["steps"] = []
+                vehicle_info["current_location"] = [77.5942765, 12.9719418]
+                vehicle_info["time_left"] = 21600
+
+            if result['tour_status'] != None:
+                tour_id = result['tour_id']
+                packages = queries.get_trip_deliveries(conn, trip_id=tour_id)
+                vehicle_info["steps"] = []
+                for row in packages:
+                    res = queries.get_loc_id_package(conn, obj_id=row["item"])
+                    if not res["completed"]:
+                        vehicle_info["steps"].append(res["delivery_loc"])
+                loc = queries.get_rider_location(conn, rider_id=rider_res[i]['rider_id'])
+                vehicle_info["current_location"] = [loc["longitude"], loc["latitude"]]
+                vehicle_info["time_left"] -= 3600
+            vehicle_json.append(vehicle_info)
+                    
+        except Exception as err:
+            conn.rollback()
+            raise HTTPException(status_code=500, detail=str(err))
+    # now give as input vehicle_indices, and input_frame
+
+    
     # output preprocessing 
     # call my load function
-    vehicles , outputs = solve_routes()
+    # vehicles , outputs = solve_routes()
 
     # insert tours
-    trip_rider_map = {}
+    # trip_rider_map = {}
 
-    # TODO: Commit all at once to prevent race
-    for each in vehicles.keys():
-        # TODO: replace rider_id with actual rider_id 
-        try:
-            bag_id = rider_bag_map[each][0]
-            rider_id = rider_bag_map[each][1]
-            results = queries.insert_tour(conn, rider_id=rider_id ,bag_id=bag_id, tour_status=0)
-            conn.commit()
-            trip_id = results['id']
-            trip_rider_map[each] = (trip_id, rider_id)
-        except Exception as err:
-            conn.rollback()
-            raise HTTPException(status_code=500, detail=str(err))
+    # # TODO: Commit all at once to prevent race
+    # for each in vehicles.keys():
+    #     # TODO: replace rider_id with actual rider_id 
+    #     try:
+    #         bag_id = rider_bag_map[each][0]
+    #         rider_id = rider_bag_map[each][1]
+    #         results = queries.insert_tour(conn, rider_id=rider_id ,bag_id=bag_id, tour_status=0)
+    #         conn.commit()
+    #         trip_id = results['id']
+    #         trip_rider_map[each] = (trip_id, rider_id)
+    #     except Exception as err:
+    #         conn.rollback()
+    #         raise HTTPException(status_code=500, detail=str(err))
 
-    # insert objects
-    for each in outputs:
-        alias = each[0]
-        obj_id = each[1]
-        try:
-            queries.insert_delivery_item(conn, tour_id=trip_rider_map[each], item=obj_id,delivery_order=each[2])
-            conn.commit()
-        except Exception as err:
-            conn.rollback()
-            raise HTTPException(status_code=500, detail=str(err))
+    # # insert objects
+    # for each in outputs:
+    #     alias = each[0]
+    #     obj_id = each[1]
+    #     try:
+    #         queries.insert_delivery_item(conn, tour_id=trip_rider_map[each], item=obj_id,delivery_order=each[2])
+    #         conn.commit()
+    #     except Exception as err:
+    #         conn.rollback()
+    #         raise HTTPException(status_code=500, detail=str(err))
     return  {'status':'ok'}
             
     # Now solve the routes and get the trip locations
     # trips, trip_indices = solve_routes()
     # Now insert the trips to the DB, and assign the riders accordingly
 
+def vehicles_json(time):
+    veh_json = {"vehicles": []}
+    for i in range(1, 41):
+        with open(f"jsons/{i}.json", 'r') as f:
+            data = json.load(f)
+            data = data[f"{i}"]
+            temp_json = {"id": f"{i}"}
+            steps = []
+            for i 
+
 @app.get("/submission")
 def solve_submission():
-    with open("../../route-planner/src/small_sample/post_noon_data.json") as f:
+    with open("../../route-planner/src/small_sample/post_morn_data.json") as f:
         contents = json.load(f)
         routes = contents["routes"]
         for rider in routes.keys():
+            with open(f"jsons/{rider}.json", 'w') as f:
+                temp_json = {rider: routes[rider]}
+                json.dump(temp_json, f)
             route = routes[rider]
-            rider = "1" + rider
+            # rider = "1" + rider
             locations_order = "77.5946,12.9716;"
             locations = [[77.5946, 12.9716]]
             for job in route:

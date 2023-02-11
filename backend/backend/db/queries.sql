@@ -51,7 +51,6 @@ UPDATE tour SET tour_status = 2 WHERE assigned_rider = :rider_id AND tour_status
 -- name: get_trip_id^
 SELECT id FROM delivery WHERE item = :object_id;
 
-<<<<<<< HEAD
 -- name: insert_tour^
 INSERT INTO tour(assigned_rider, assigned_bag, tour_status) VALUES(:rider_id, :bag_id, :tour_status);
 
@@ -60,13 +59,20 @@ INSERT INTO delivery(id, item, delivery_order) VALUES(:tour_id, :item, :delivery
 
 -- name: get_undelivered_packages
 SELECT * FROM package LEFT JOIN location ON package.delivery_loc = location.loc_id WHERE package.completed = False ORDER BY location.loc_id;
-=======
+
 -- name: get_trip_deliveries
 SELECT item FROM delivery WHERE id = :trip_id ORDER by delivery_order;
 
 -- name: get_latlong^
 SELECT latitude, longitude FROM location INNER JOIN package ON location.loc_id = package.delivery_loc WHERE package.object_id = :obj_id;
 
---name: check_delivery^
+-- name: check_delivery^
 SELECT completed FROM package WHERE object_id = :obj_id;
->>>>>>> 82c118ec79bae5ff98d9e41e539c8fcda58f7ce4
+
+-- name: get_loc_id_package^
+SELECT delivery_loc, completed FROM package WHERE object_id = :obj_id;
+
+-- name: get_rider_location^
+SELECT latitude, longitude FROM rider WHERE rider_id = :rider_id;
+
+SELECT arrival_time FROM package_arrival INNER JOIN delivery ON package_arrival.object_id = delivery.item 
