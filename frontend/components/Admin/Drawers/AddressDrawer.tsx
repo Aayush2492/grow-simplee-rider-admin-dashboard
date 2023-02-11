@@ -36,17 +36,37 @@ function AddressDrawer() {
   }
   async function addaddresscsv() {
     if (csvfile) {
+      const state: string[] = [];
       readXlsxFile(csvfile).then((rows) => {
         // `rows` is an array of rows
         // each row being an array of cells.
         rows.forEach((element, index) => {
           if (element[0] != 'address') {
-            addaddress(element[0].toString());
-            console.log(index, element[0].toString());
+            state.push(element[0].toString());
           }
         });
       });
-      console.log(rows);
+      console.log(state);
+      let another;
+      try {
+        another = await fetch(`${BASE_URL}/addaddresscsv/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            address: state,
+          }),
+        });
+
+        if (!another.ok) {
+          // throw new Error('Error in fetch addaddress/');
+        }
+      } catch (err) {
+        // alert('error caught in fetch addaddress/');
+        console.log(err);
+        return;
+      }
     }
   }
   return (

@@ -9,7 +9,7 @@ import { RiderContext } from '../context/RiderContext';
 import { GenjsonContext } from '../context/GeojsonContext';
 
 const icon = L.icon({
-  iconUrl: 'map.png',
+  iconUrl: 'https://cdn.pixabay.com/photo/2020/12/21/11/15/google-5849613_960_720.png',
   iconSize: [38, 38],
 });
 
@@ -57,6 +57,10 @@ export default function Map({ height, width }: { height: string; width: string }
   //   console.log('geoJSON', geoJSON);
   // });
 
+  function createMarker(feature, latlng) {
+    return L.marker(latlng, { icon: icon });
+  }
+
   return (
     <MapContainer
       center={[
@@ -67,7 +71,7 @@ export default function Map({ height, width }: { height: string; width: string }
       style={{ height: height, width: width, position: 'fixed', top: 0, left: 0, zIndex: 0 }}
       scrollWheelZoom={true}
     >
-      {geoJSON && <GeoJSON data={geoJSON} />}
+      {geoJSON && <GeoJSON data={geoJSON} pointToLayer={createMarker} />}
       {/* <GeoJSON data={data} /> */}
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
