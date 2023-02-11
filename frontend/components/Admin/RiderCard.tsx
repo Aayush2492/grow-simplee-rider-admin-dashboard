@@ -1,6 +1,7 @@
 import { Card, Text, Badge, Button, Group, List } from '@mantine/core';
 import { PositionContext } from '../context';
 import { useContext } from 'react';
+import { GenjsonContext } from '../context/GeojsonContext';
 
 interface Rider {
   id: number;
@@ -11,7 +12,20 @@ interface Rider {
 }
 
 export default function RiderCard(item: Rider) {
+  const { geoJSON, setgeoJson } = useContext(GenjsonContext);
   const { selectPosition, setSelectPosition, BASE_URL } = useContext(PositionContext);
+  const showGeojson = () => {
+    try {
+      fetch(BASE_URL + '/rider/' + item.id + '/viewtrip').then((res) =>
+        res.json().then((data) => {
+          console.log(data['geo-json']);
+          setgeoJson(data['geo-json']);
+        })
+      );
+    } catch (err) {
+      console.log('Error fetching all locations', err);
+    }
+  };
   return (
     <Card shadow="sm" p="lg" radius="md" withBorder style={{ maxWidth: 350, margin: '0' }}>
       <Group position="apart" mt="md" mb="xs">
@@ -46,7 +60,7 @@ export default function RiderCard(item: Rider) {
         Show current position
       </Button>
 
-      <Button variant="light" color="green" fullWidth mt="md" radius="md">
+      <Button variant="light" color="green" fullWidth mt="md" radius="md" onClick={showGeojson}>
         Show route
       </Button>
     </Card>

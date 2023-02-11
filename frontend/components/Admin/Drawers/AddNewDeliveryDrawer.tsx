@@ -29,6 +29,7 @@ export default function AddNewDeliveryDrawer({ isDelivery }) {
         });
         // console.log('Locs', locations);
         setLocations(locations);
+        console.log('location', locations);
       } catch (err) {
         console.log('Error fetching all locations', err);
       }

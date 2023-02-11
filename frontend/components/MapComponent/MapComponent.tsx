@@ -6,9 +6,10 @@ import { MapContainer, Marker, TileLayer, Popup, GeoJSON, useMap } from 'react-l
 // import geoJSONData from '../../data/karnataka_geodata.json';
 import { PositionContext } from '../context';
 import { RiderContext } from '../context/RiderContext';
+import { GenjsonContext } from '../context/GeojsonContext';
 
 const icon = L.icon({
-  iconUrl: 'map.png',
+  iconUrl: 'https://cdn.pixabay.com/photo/2020/12/21/11/15/google-5849613_960_720.png',
   iconSize: [38, 38],
 });
 
@@ -36,6 +37,7 @@ function ResetCenterView(props: { selectPosition: null | { lat: number; lon: num
 
 export default function Map({ height, width }: { height: string; width: string }) {
   const { rider, setRider, BASE_URL } = useContext(RiderContext);
+  const { geoJSON } = useContext(GenjsonContext);
 
   console.log('Rider', rider);
   // console.log('geo', geoJSONData);
@@ -50,8 +52,14 @@ export default function Map({ height, width }: { height: string; width: string }
   //     selectPosition.lon <= 180 && selectPosition.lon >= -180 ? selectPosition.lon : 77.5946,
   //   ]);
   // }, []);
-
   const { selectPosition } = useContext(PositionContext);
+  // useEffect(() => {
+  //   console.log('geoJSON', geoJSON);
+  // });
+
+  function createMarker(feature, latlng) {
+    return L.marker(latlng, { icon: icon });
+  }
 
   return (
     <MapContainer
@@ -63,10 +71,13 @@ export default function Map({ height, width }: { height: string; width: string }
       style={{ height: height, width: width, position: 'fixed', top: 0, left: 0, zIndex: 0 }}
       scrollWheelZoom={true}
     >
+      {geoJSON && <GeoJSON data={geoJSON} pointToLayer={createMarker} />}
+      {/* <GeoJSON data={data} /> */}
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
+
       {selectPosition && (
         <Marker
           position={[

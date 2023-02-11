@@ -12,6 +12,9 @@ import {
 import { TablerIcon, IconLogout, IconPackage, IconUser } from '@tabler/icons';
 import { ColorSchemeToggle } from './ColorSchemeToggle/ColorSchemeToggle';
 import { RiderContext } from './context/RiderContext';
+import { Button } from '@mantine/core';
+import { PositionContext } from './context';
+import { GenjsonContext } from './context/GeojsonContext';
 
 const useStyles = createStyles((theme) => ({
   link: {
@@ -61,8 +64,7 @@ const mockdata = [
 
 export default function RiderNavbar({ children }) {
   const [active, setActive] = useState(0);
-  const { rider, setRider } = useContext(RiderContext);
-
+  const [currrider, setcurrrider] = useState({ name: '', contact: -1, id: -1 });
   const links = mockdata.map((link, index) => (
     <NavbarLink
       {...link}
@@ -71,12 +73,33 @@ export default function RiderNavbar({ children }) {
       onClick={() => setActive(index === active ? -1 : index)}
     />
   ));
-
+  const { setgeoJson } = useContext(GenjsonContext);
+  const { setSelectPosition } = useContext(PositionContext);
   useEffect(() => {
-    console.log(window.location.href);
-    console.log('riderID', rider.id);
+    fetch(
+      `http://localhost:8000/rider/${
+        window.location.href.split('/')[window.location.href.split('/').length - 1]
+      }`
+    ).then((res) =>
+      res.json().then((data) => {
+        console.log('rider', data);
+        setSelectPosition({ lat: data.latitude, lon: data.longitude, placename: '' });
+        setcurrrider({ id: data.rider_id, name: data.name, contact: data.contact });
+      })
+    );
   }, []);
-
+  const { BASE_URL } = useContext(PositionContext);
+  const showGeojson = (id: string) => {
+    try {
+      fetch(BASE_URL + '/rider/' + id + '/viewtrip').then((res) =>
+        res.json().then((data) => {
+          setgeoJson(data['geo-json']);
+        })
+      );
+    } catch (err) {
+      console.log('Error fetching all locations', err);
+    }
+  };
   return (
     <>
       <Flex
@@ -104,7 +127,12 @@ export default function RiderNavbar({ children }) {
             <div style={{ paddingLeft: 40 }}>
               {active === 0 && (
                 <>
-                  Hello, {rider.name}, {rider.contact}, {rider.id}
+                  <h1>
+                    Hello, {currrider.name}, {currrider.contact}, {currrider.id}
+                  </h1>
+                  <Button variant="filled" onClick={(id) => showGeojson(currrider.id.toString())}>
+                    Render Route
+                  </Button>
                 </>
               )}
             </div>
