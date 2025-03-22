@@ -38,11 +38,46 @@ number_vehicles = number_deliveries // 22
 # speed_factor = 6.5 # 6.5 m/s = 23.25 km/h
 hub_coord = del_df["lon"][0], del_df["lat"][0]
 
+<<<<<<< Updated upstream
 # Cluster Here and give a list of indexes of jobs
 # For now, we just assume that all jobs are in one cluster
 pickup_clusters = [{"vehicles": [i for i in range(1, number_vehicles + 1)],
                     "deliveries": [i for i in range(1, number_deliveries + 1)],
                     "pickups": [i for i in range(1, number_pickups + 1)]}]
+=======
+    def update_assigned_vehicle_and_add_to_jobs(_route, _vehicle_id):
+        _steps = [{"type": "start"}]
+        for _step in _route:
+            if _step["type"] == "job":
+                _id = str(_step["id"])
+                if _step["arrival"] <= time_diff.total_seconds():
+                    package_info[_id]["assigned_vehicle"] = -2  # -2 means delivered
+                    package_info[_id]["done"] = False
+                    continue
+                elif package_info[_id]["type"] == "delivery":
+                    package_info[_id]["assigned_vehicle"] = _vehicle_id
+                    inp["jobs"].append({
+                        "id": _step["id"],
+                        "location": package_info[_id]["location"],
+                        # "delivery": [package_info[_id]["volume"]],
+                        "delivery": [1],
+                        "skills": [int(_vehicle_id)],  # This HAS to be done by this vehicle
+                        "priority": 100,  # This HAS to be done
+                    })
+                elif package_info[_id]["type"] == "pickup":
+                    # This is an undone pickup and hence can be procrastinated
+                    # Unassign the vehicle to this pickup to compute it together with the rest
+                    package_info[_id]["assigned_vehicle"] = -1  # -1 means not assigned
+                _steps.append({
+                    "type": "job",
+                    "id": _step["id"],
+                })
+            elif _step["type"] == "end":
+                _steps.append({
+                    "type": "end",
+                })
+        return _steps
+>>>>>>> Stashed changes
 
 
 def update_assigned_vehicle_and_add_to_jobs(_route, _vehicle_id):
@@ -54,6 +89,7 @@ def update_assigned_vehicle_and_add_to_jobs(_route, _vehicle_id):
         elif step["type"] == "job" and step["id"] <= 5000:
             # This is a delivery and HAS to be performed by the current vehicle
             inp["jobs"].append({
+<<<<<<< Updated upstream
                 "id": step["id"],
                 "location": [float(del_df["lon"][step["id"]]), float(del_df["lat"][step["id"]])],
                 "delivery": [int(del_df["volume"][step["id"]] / 125)],
@@ -68,6 +104,26 @@ def update_assigned_vehicle_and_add_to_jobs(_route, _vehicle_id):
             _steps.append({
                 "type": "job",
                 "id": step["id"],
+=======
+                "id": int(pickup_id),
+                "location": package_info[str(pickup_id)]["location"],
+                # "pickup": [package_info[str(pickup_id)]["volume"]],
+                "pickup": [1],
+                "priority": 3,
+            })
+
+        # Create vehicles
+        for vehicle_id in cluster["vehicles"]:
+            inp["vehicles"].append({
+                "id": int(vehicle_id),
+                "start": hub_coord,
+                "end": hub_coord,
+                "speed_factor": SPEED_FACTOR,
+                "max_travel_time": int((end_time - cur_time).total_seconds()),
+                # "capacity": [MAX_VOLUME[int(vehicle_id) % 2] - MAX_OBJECT_SIZE],
+                "capacity": [26],
+                "skills": [int(vehicle_id)]
+>>>>>>> Stashed changes
             })
         elif step["type"] == "end":
             _steps.append({

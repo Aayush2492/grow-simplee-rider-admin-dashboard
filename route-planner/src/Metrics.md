@@ -1,0 +1,2 @@
+- We have 40 derivers and a few unassigned orders
+- Average Distance Travelled is around
